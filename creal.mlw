@@ -108,3 +108,69 @@ ensures { result = ED.div z (power 2 l) }
   assert { p2l > 0 };
   let d, _ = ediv_mod z p2l in
     d
+
+(*---------------------------------------------
+    Question 5
+  ---------------------------------------------*)
+
+let function isqrt (n: int) : int
+  requires {0 <= n}
+  ensures { result = floor (sqrt (from_int n)) }
+=
+  let res = ref 0 in
+  while (!res + 1) * (!res + 1) <= n do
+    invariant { !res >= 0 }
+    invariant { !res * !res <= n }
+    variant { n - (!res * !res) }
+    res := !res + 1;
+  done;
+  assert { sqrt (from_int (!res * !res))
+            <=. sqrt (from_int n)
+            <. sqrt (from_int ((!res +1) * (!res+1))) };
+  !res
+      
+let lemma euclid_uniq (x y q : int) : unit
+  requires { y > 0 }
+  requires { q * y <= x < q *y + y }
+  ensures { ED.div x y = q }
+= () 
+
+(* ___ ___ ___   _   _             _     _                       
+  |_ _|_ _|_ _| | \ | | ___  _ __ | |   (_)_ __   ___  __ _ _ __ 
+   | | | | | |  |  \| |/ _ \| '_ \| |   | | '_ \ / _ \/ _` | '__|
+   | | | | | | _| |\  | (_) | | | | |___| | | | |  __/ (_| | |   
+  |___|___|___(_)_| \_|\___/|_| |_|_____|_|_| |_|\___|\__,_|_|   
+*)
+
+use real.PowerReal
+
+let ghost function _B (n: int) : real = pow 4.0 (from_int n)
+
+lemma positiv:
+  forall n: int. _B n >=. 0.0
+
+lemma morphisme: 
+  forall n m: int. (_B n) *. (_B m) = _B (n+m)
+
+lemma inv:
+  forall n: int. (_B n) *. (_B (-n)) = 1.0
+
+ 
+lemma sqrt_B_2n_B_n: 
+  forall n: int. sqrt (_B (2*n)) = _B n
+
+lemma question9:
+  forall a: real. forall n: int.
+  0.0 <=. a -> sqrt (a *. _B (2*n)) = sqrt a *. _B n
+  
+lemma B_y_power_4_y_pos:
+  forall y: int.
+  0 <= y -> _B y = from_int (power 4 y) 
+
+lemma B_y_power_4_y_neg:
+  forall y: int.
+  y < 0 -> _B y = from_int (power 4 (-y))
+
+lemma power_2_2_is_4:
+  forall y: int.
+  0 <= y -> power 2 (2 * y) = power 4 y
