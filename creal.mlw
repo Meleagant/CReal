@@ -186,7 +186,7 @@ lemma B_y_power_4_y_pos:
   ---------------------------------------------*)
 lemma B_y_power_4_y_neg:
   forall y: int.
-  y < 0 -> inv (_B y) = from_int (power 4 (-y))
+  y < 0 -> inv (_B y) = _B (-y) = from_int (power 4 (-y))
 
 (*---------------------------------------------
     Question 12
@@ -247,8 +247,13 @@ let compute_round (n: int) (ghost z: real) (zp: int)
 =
   let res = round_z_over_4 zp in (* res = (zp + 2)//4 *)
   (* Prove left *)
-  assert { (from_int res -. 1.) <=. ((from_int zp) -. 2.) /. 4. };
-  assert { _B (-(n+1)) = _B (-n) /. 4. };
+  let ghost z' = zp - 2 in
+  assert { (from_int res -. 1.) <=. ((from_int zp) -. 2.) /. 4.
+    by from_int res -. 1. 
+    <=. ((from_int zp) +. 2.) *. _B (-1) -. 1.
+    = ((from_int zp) +. 2.) /. 4. -. 1.
+    = ((from_int zp) -. 2.) /. 4. };
+  assert { _B (-(n+1)) = _B (-n) *. _B (-1) = _B (-n) /. 4. };
   assert { (from_int res -. 1.) *. (_B (-n)) 
           <=. (((from_int zp) -. 2.) /. 4.)  *. (_B (-(n)))};
   (* Prove right *)
@@ -351,7 +356,7 @@ let compute_cst (n: int) (x : int) : int
   ---------------------------------------------*)
 
 lemma sqrt_floor:
-  forall n: int.
+  forall n: int. n >= 1 ->
   ceil (sqrt (from_int (n+1))) - 1 
   <= floor (sqrt (from_int n)) 
   <= floor (sqrt (from_int(n-1))) + 1
@@ -367,12 +372,13 @@ let compute_sqrt (n: int) (ghost x : real) (xp : int)
 =
   if xp <= 0 then
   begin
-    assert { xp >= 0 };
     assert { framing (sqrt x) 0 n };
     0
   end
   else
     let ghost res = isqrt xp in
     assert { res = floor (sqrt (from_int xp)) };
+    assert { sqrt (x -. 1.) <. sqrt x };
+    assert { (sqrt (x -. 1.) +. 1. ) <. sqrt x +. 1. };
     assert { framing (sqrt x) res n };
     isqrt xp
