@@ -149,51 +149,59 @@ let ghost function _B (n: int) : real = pow 4.0 (from_int n)
 (*---------------------------------------------
     Question 6
   ---------------------------------------------*)
-lemma positiv:
-  forall n: int. _B n >=. 0.0
+let lemma positiv (n: int) : unit 
+  ensures { _B n >=. 0.0 }
+= ()
 
 (*---------------------------------------------
     Question 7
   ---------------------------------------------*)
-lemma morphisme: 
-  forall n m: int. (_B n) *. (_B m) = _B (n+m)
+let lemma morphisme (n m: int): unit 
+  ensures { (_B n) *. (_B m) = _B (n+m) }
+= ()
 
 (*---------------------------------------------
     Question 8
   ---------------------------------------------*)
-lemma inv:
-  forall n: int. (_B n) *. (_B (-n)) = 1.0
+let lemma inv (n: int) : unit
+  ensures { (_B n) *. (_B (-n)) = 1.0 }
+= ()
  
 (*---------------------------------------------
     Question 9
   ---------------------------------------------*)
-lemma sqrt_B_2n_B_n: 
-  forall n: int. sqrt (_B (2*n)) = _B n
 
-lemma question9:
-  forall a: real. forall n: int.
-  0.0 <=. a -> sqrt (a *. _B (2*n)) = sqrt a *. _B n
+let lemma question9 (a: real) (n: int) : unit
+  requires { 0.0 <=. a }
+  ensures {sqrt (a *. _B (2*n)) = sqrt a *. _B n }
+= 
+  assert { sqrt (_B (2*n)) = _B n };
+  ()
   
 (*---------------------------------------------
     Question 10
   ---------------------------------------------*)
-lemma B_y_power_4_y_pos:
-  forall y: int.
-  0 <= y -> _B y = from_int (power 4 y) 
+let lemma b_y_power_4_y_pos (y: int) : unit
+  requires { 0 <= y }
+  ensures { _B y = from_int (power 4 y) }
+= ()
 
 (*---------------------------------------------
     Question 11
   ---------------------------------------------*)
-lemma B_y_power_4_y_neg:
-  forall y: int.
-  y < 0 -> inv (_B y) = _B (-y) = from_int (power 4 (-y))
-
+let lemma b_y_power_4_y_neg (y: int) : unit
+  requires { y < 0 }
+  ensures { inv (_B y) = from_int (power 4 (-y)) }
+=
+  assert { inv (_B y) = _B (-y) }; 
+  ()
 (*---------------------------------------------
     Question 12
   ---------------------------------------------*)
-lemma power_2_2_is_4:
-  forall y: int.
-  0 <= y -> power 2 (2 * y) = power 4 y
+let lemma power_2_2_is_4 (y: int) : unit
+  requires { 0 <= y }
+  ensures { power 2 (2 * y) = power 4 y }
+= ()
 
 (*__     _____   ____                            _   ____            _ 
   \ \   / /_ _| / ___|___  _ __ ___  _ __  _   _| |_|  _ \ ___  __ _| |
@@ -355,11 +363,25 @@ let compute_cst (n: int) (x : int) : int
     Question 17
   ---------------------------------------------*)
 
-lemma sqrt_floor:
-  forall n: int. n >= 1 ->
-  ceil (sqrt (from_int (n+1))) - 1 
-  <= floor (sqrt (from_int n)) 
-  <= floor (sqrt (from_int(n-1))) + 1
+let lemma sqrt_floor (n: int) : unit
+  requires { n >= 1 }
+  ensures { ceil (sqrt (from_int (n+1))) - 1 
+            <= floor (sqrt (from_int n)) 
+            <= floor (sqrt (from_int(n-1))) + 1 }
+= 
+  (* Prove left *) 
+  assert { from_int n <=. (from_int n) +. 2. *. sqrt( from_int (n - 1)) }; 
+  assert { sqrt ( from_int(n-1)) +. 1. = sqrt  ((from_int n) +. 2. *. sqrt( from_int (n - 1)))
+    by (sqrt ( from_int(n-1)) +. 1. ) *. (sqrt ( from_int(n-1)) +. 1.) 
+       = ((from_int n) +. 2. *. sqrt( from_int (n - 1))) };
+  assert { sqrt (from_int n) <=. sqrt ( from_int(n-1)) +. 1. };
+  
+  (* Prove right *)
+  assert { floor (sqrt (from_int n) -. sqrt (from_int (n+1))) <= 1 };
+  assert { floor (sqrt (from_int n) -. sqrt (from_int (n+1)))
+           = floor (sqrt (from_int n)) - floor (sqrt (from_int (n+1))) };
+  
+  ()
 
 (*---------------------------------------------
     Question 18
@@ -382,3 +404,72 @@ let compute_sqrt (n: int) (ghost x : real) (xp : int)
     assert { (sqrt (x -. 1.) +. 1. ) <. sqrt x +. 1. };
     assert { framing (sqrt x) res n };
     isqrt xp
+
+type term = 
+  | Cst int
+  | Add term term
+  | Neg term
+  | Sub term term
+  | Sqrt term
+
+let rec ghost function interp (t: term) : real =
+  match t with
+  | Cst i -> from_int i
+  | Add t t' -> (interp t) +. (interp t')
+  | Neg t -> 0. -. (interp t)
+  | Sub t t' -> (interp t) -. (interp t')
+  | Sqrt t -> sqrt (interp t)
+  end
+
+predicate wf_term (t: term) =
+  match t with
+  | Cst i -> True
+  | Add t t' -> (wf_term t) /\ (wf_term t')
+  | Neg t -> (wf_term t)
+  | Sub t t' -> (wf_term t) /\ (wf_term t')
+  | Sqrt t -> (wf_term t) /\ (interp t >=. 0.)
+  end
+
+let rec compute (t: term) (n: int) : int
+  requires { wf_term t }
+  variant { t }
+  ensures { framing (interp t) result n }
+=
+  match t with
+  | Cst i -> 
+    let res = compute_cst n i in
+    assert { framing (interp t) res n };
+      (*
+      compute_cst n i
+      *) res
+  | Add t1 t2 -> 
+    let x1 = compute t1 (n+1) in
+    let x2 = compute t2 (n+1) in
+    let res = compute_add n (interp t1) x1 (interp t2) x2 in
+      assert { framing (interp t) res n };
+      (*
+      compute_add n (interp t1) x1 (interp t2) x2
+      *) res
+  | Neg t' -> 
+    let x = compute t' n in
+    let res = compute_neg n (interp t') x in
+      assert { framing (interp t) res n };
+      (*
+      compute_neg n (interp t') x
+      *) res
+  | Sub t1 t2 ->
+    let x1 = compute t1 (n+1) in
+    let x2 = compute t2 (n+1) in
+    let res = compute_sub n (interp t1) x1 (interp t2) x2 in
+      assert { framing (interp t) res n };
+      (*
+      compute_sub n (interp t1) x1 (interp t2) x2
+      *) res
+  | Sqrt t' -> 
+    let x = compute t' (2*n) in
+    let res = compute_sqrt n (interp t') x in
+      assert { framing (interp t) res n };
+      (*
+      compute_sqrt n (interp t') x
+      *) res
+  end
