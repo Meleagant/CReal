@@ -377,10 +377,21 @@ let lemma sqrt_floor (n: int) : unit
   assert { sqrt (from_int n) <=. sqrt ( from_int(n-1)) +. 1. };
   
   (* Prove right *)
-  assert { floor (sqrt (from_int n) -. sqrt (from_int (n+1))) <= 1 };
-  assert { floor (sqrt (from_int n) -. sqrt (from_int (n+1)))
-           = floor (sqrt (from_int n)) - floor (sqrt (from_int (n+1))) };
-  
+  let ghost z0 = floor (sqrt (from_int n)) in
+  assert { z0 >= 1 };
+  assert { (z0 + 1) * (z0 +1) >= n + 1
+    by (from_int z0 +. 1.) *. (from_int z0 +. 1.) 
+        = sqr (from_int z0) +. 2. *. (from_int z0) +. 1.
+    so sqrt (from_int n) -. (from_int z0) <. 1.
+    so sqr (from_int z0) +. 2. *. (from_int z0) +. 1.
+      >=. sqr ( (sqrt (from_int n)) -. 1. ) +. 2. *. (from_int z0) +. 1.
+      = (from_int n) +. 2. -. 2. *. (sqrt (from_int n) -. (from_int z0))
+      >. (from_int n) +. 2. -. 2.     
+    so (z0 + 1) * (z0+1) > n };
+  assert { sqrt (from_int (n + 1)) <=. from_int z0 +. 1. 
+    by from_int ((z0 + 1) * (z0 + 1)) 
+      = ((from_int z0) +. 1. ) *. ((from_int z0) +. 1. ) 
+      >=. from_int ( n + 1 ) };
   ()
 
 (*---------------------------------------------
@@ -400,10 +411,22 @@ let compute_sqrt (n: int) (ghost x : real) (xp : int)
   else
     let ghost res = isqrt xp in
     assert { res = floor (sqrt (from_int xp)) };
+    let ghost _ = question9 (x -. 1.) (-n) in
+    assert { (sqrt ( x -. 1.)) *. (_B (-n))
+      = sqrt ( (x -. -1.) *. (_B (-2*n)))
+      <. sqrt (from_int xp)
+      <. sqrt ( (x +. -1.) *. (_B (-2*n)))
+      =  (sqrt ( x +. 1.)) *. (_B (-n)) 
+      };
     assert { sqrt (x -. 1.) <. sqrt x };
     assert { (sqrt (x -. 1.) +. 1. ) <. sqrt x +. 1. };
     assert { framing (sqrt x) res n };
     isqrt xp
+
+
+
+
+
 
 type term = 
   | Cst int

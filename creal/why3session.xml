@@ -3,11 +3,10 @@
 "http://why3.lri.fr/why3session.dtd">
 <why3session shape_version="5">
 <prover id="0" name="Alt-Ergo" version="2.2.0" timelimit="30" steplimit="0" memlimit="2000"/>
-<prover id="1" name="CVC4" version="1.4" timelimit="30" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.4" timelimit="30" steplimit="0" memlimit="2000"/>
+<prover id="2" name="CVC3" version="2.4.1" timelimit="30" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Coq" version="8.6.1" timelimit="0" steplimit="0" memlimit="0"/>
-<prover id="5" name="Z3" version="4.4.1" timelimit="30" steplimit="0" memlimit="2000"/>
-<prover id="6" name="Z3" version="4.4.1" alternative="noBV" timelimit="30" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.4.1" timelimit="90" steplimit="0" memlimit="2000"/>
 <prover id="7" name="Coq" version="8.8.1" timelimit="0" steplimit="0" memlimit="0"/>
 <file name="../creal.mlw">
 <theory name="Top">
@@ -160,7 +159,6 @@
  <proof prover="0" memlimit="100"><result status="valid" time="0.12" steps="351"/></proof>
  </goal>
  <goal name="VC question9" expl="VC for question9" proved="true">
- <proof prover="0" memlimit="100"><result status="timeout" time="30.00"/></proof>
  <transf name="split_vc" proved="true" >
   <goal name="VC question9.0" expl="assertion" proved="true">
   <proof prover="0" timelimit="90"><result status="valid" time="0.14" steps="167"/></proof>
@@ -171,8 +169,8 @@
  </transf>
  </goal>
  <goal name="VC b_y_power_4_y_pos" expl="VC for b_y_power_4_y_pos" proved="true">
- <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
- <proof prover="5" memlimit="1000"><result status="valid" time="0.02"/></proof>
+ <proof prover="0" timelimit="90"><result status="failure" time="0.00"/></proof>
+ <proof prover="5"><result status="valid" time="0.02"/></proof>
  </goal>
  <goal name="VC b_y_power_4_y_neg" expl="VC for b_y_power_4_y_neg" proved="true">
  <transf name="split_vc" proved="true" >
@@ -195,8 +193,7 @@
    <proof prover="0" memlimit="1000"><result status="valid" time="0.12" steps="177"/></proof>
    </goal>
    <goal name="VC round_z_over_4.0.1" expl="VC for round_z_over_4" proved="true">
-   <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
-   <proof prover="5"><result status="valid" time="0.03"/></proof>
+   <proof prover="5" timelimit="30"><result status="valid" time="0.03"/></proof>
    </goal>
   </transf>
   </goal>
@@ -217,7 +214,6 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="VC round_z_over_4.3" expl="postcondition" proved="true">
-  <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
   <transf name="split_vc" proved="true" >
    <goal name="VC round_z_over_4.3.0" expl="VC for round_z_over_4" proved="true">
    <proof prover="0" memlimit="1000"><result status="valid" time="2.28" steps="918"/></proof>
@@ -363,16 +359,12 @@
   </goal>
  </transf>
  </goal>
- <goal name="VC sqrt_floor" expl="VC for sqrt_floor">
- <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
- <proof prover="1" obsolete="true"><result status="timeout" time="30.00"/></proof>
- <proof prover="2" obsolete="true"><result status="highfailure" time="0.04"/></proof>
- <transf name="split_vc" >
+ <goal name="VC sqrt_floor" expl="VC for sqrt_floor" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="VC sqrt_floor.0" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.01" steps="12"/></proof>
   </goal>
   <goal name="VC sqrt_floor.1" expl="assertion" proved="true">
-  <proof prover="0" obsolete="true"><result status="timeout" time="30.00"/></proof>
   <transf name="split_vc" proved="true" >
    <goal name="VC sqrt_floor.1.0" expl="VC for sqrt_floor" proved="true">
    <proof prover="0"><result status="valid" time="0.02" steps="83"/></proof>
@@ -386,21 +378,53 @@
   <proof prover="0"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="VC sqrt_floor.3" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="145"/></proof>
+  <proof prover="0" timelimit="90"><result status="valid" time="0.05" steps="258"/></proof>
   </goal>
-  <goal name="VC sqrt_floor.4" expl="assertion">
-  <proof prover="0" timelimit="90"><undone/></proof>
-  <proof prover="5" obsolete="true"><result status="outofmemory" time="20.20"/></proof>
+  <goal name="VC sqrt_floor.4" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC sqrt_floor.4.0" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.01" steps="20"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.4.1" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.01" steps="22"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.4.2" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="23.87" steps="5412"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.4.3" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.14" steps="425"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.4.4" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.01" steps="22"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.4.5" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.71" steps="477"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.4.6" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.01" steps="29"/></proof>
+   </goal>
+  </transf>
   </goal>
-  <goal name="VC sqrt_floor.5" expl="postcondition">
-  <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
-  <transf name="split_vc" >
-   <goal name="VC sqrt_floor.5.0" expl="VC for sqrt_floor">
-   <proof prover="0" timelimit="90"><undone/></proof>
-   <proof prover="5" obsolete="true"><result status="highfailure" time="0.00"/></proof>
+  <goal name="VC sqrt_floor.5" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC sqrt_floor.5.0" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.02" steps="22"/></proof>
    </goal>
    <goal name="VC sqrt_floor.5.1" expl="VC for sqrt_floor" proved="true">
-   <proof prover="0"><result status="valid" time="0.44" steps="591"/></proof>
+   <proof prover="0" timelimit="90"><result status="valid" time="0.41" steps="472"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.5.2" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.26" steps="682"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC sqrt_floor.6" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC sqrt_floor.6.0" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.10" steps="178"/></proof>
+   </goal>
+   <goal name="VC sqrt_floor.6.1" expl="VC for sqrt_floor" proved="true">
+   <proof prover="0" timelimit="90"><result status="valid" time="0.86" steps="1926"/></proof>
    </goal>
   </transf>
   </goal>
@@ -410,8 +434,8 @@
  <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
  <proof prover="3" obsolete="true" edited="creal_Top_VC_compute_sqrt_1.v"><result status="unknown" time="0.00" steps="0"/></proof>
  <transf name="split_vc" >
-  <goal name="VC compute_sqrt.0" expl="assertion">
-  <proof prover="0" timelimit="90"><undone/></proof>
+  <goal name="VC compute_sqrt.0" expl="assertion" proved="true">
+  <proof prover="0" timelimit="90"><result status="valid" time="4.75" steps="2739"/></proof>
   </goal>
   <goal name="VC compute_sqrt.1" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="14"/></proof>
@@ -419,22 +443,44 @@
   <goal name="VC compute_sqrt.2" expl="assertion" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
-  <goal name="VC compute_sqrt.3" expl="assertion">
-  <proof prover="0" timelimit="90"><undone/></proof>
-  <proof prover="5" obsolete="true"><result status="timeout" time="30.00"/></proof>
+  <goal name="VC compute_sqrt.3" expl="precondition">
+  <proof prover="0" timelimit="90"><result status="timeout" time="90.00"/></proof>
+  <proof prover="5"><result status="outofmemory" time="16.85"/></proof>
   </goal>
-  <goal name="VC compute_sqrt.4" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="18"/></proof>
-  <proof prover="6" obsolete="true"><result status="timeout" time="30.00"/></proof>
+  <goal name="VC compute_sqrt.4" expl="assertion">
+  <proof prover="0" timelimit="90" obsolete="true"><undone/></proof>
+  <transf name="split_vc" >
+   <goal name="VC compute_sqrt.4.0" expl="VC for compute_sqrt">
+   <proof prover="0" timelimit="90"><result status="timeout" time="90.00"/></proof>
+   <proof prover="5"><result status="outofmemory" time="17.00"/></proof>
+   </goal>
+   <goal name="VC compute_sqrt.4.1" expl="VC for compute_sqrt">
+   <proof prover="0" timelimit="90" obsolete="true"><undone/></proof>
+   <proof prover="5"><result status="outofmemory" time="17.20"/></proof>
+   </goal>
+   <goal name="VC compute_sqrt.4.2" expl="VC for compute_sqrt">
+   <proof prover="0" timelimit="90" obsolete="true"><undone/></proof>
+   <proof prover="5" obsolete="true"><result status="outofmemory" time="17.17"/></proof>
+   </goal>
+   <goal name="VC compute_sqrt.4.3" expl="VC for compute_sqrt">
+   </goal>
+  </transf>
   </goal>
   <goal name="VC compute_sqrt.5" expl="assertion">
-  <proof prover="0" timelimit="90"><undone/></proof>
+  <proof prover="0" timelimit="90" obsolete="true"><undone/></proof>
+  <proof prover="5" timelimit="30" obsolete="true"><result status="timeout" time="30.00"/></proof>
   </goal>
-  <goal name="VC compute_sqrt.6" expl="precondition" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="21"/></proof>
+  <goal name="VC compute_sqrt.6" expl="assertion">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
-  <goal name="VC compute_sqrt.7" expl="postcondition" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.00" steps="14"/></proof>
+  <goal name="VC compute_sqrt.7" expl="assertion">
+  <proof prover="0" timelimit="90" obsolete="true"><undone/></proof>
+  </goal>
+  <goal name="VC compute_sqrt.8" expl="precondition">
+  <proof prover="0" memlimit="1000" obsolete="true"><result status="valid" time="0.01" steps="21"/></proof>
+  </goal>
+  <goal name="VC compute_sqrt.9" expl="postcondition">
+  <proof prover="0" memlimit="1000" obsolete="true"><result status="valid" time="0.00" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
@@ -516,16 +562,13 @@
   <proof prover="0"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="VC compute.24" expl="postcondition">
-  <proof prover="0" timelimit="90"><undone/></proof>
-  <proof prover="1" memlimit="2000" obsolete="true"><result status="timeout" time="30.00"/></proof>
-  <proof prover="2" memlimit="2000" obsolete="true"><result status="highfailure" time="0.02"/></proof>
-  <proof prover="5" obsolete="true"><result status="timeout" time="30.00"/></proof>
+  <proof prover="0" timelimit="90"><result status="timeout" time="90.00"/></proof>
+  <proof prover="1" obsolete="true"><result status="timeout" time="30.00"/></proof>
+  <proof prover="2" obsolete="true"><result status="highfailure" time="0.02"/></proof>
+  <proof prover="5" timelimit="30" obsolete="true"><result status="timeout" time="30.00"/></proof>
   <proof prover="7" obsolete="true" edited="creal_Top_VC_compute_1.v"><result status="unknown" time="0.00" steps="0"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="question9">
- <proof prover="0" timelimit="90"><undone/></proof>
  </goal>
 </theory>
 </file>
