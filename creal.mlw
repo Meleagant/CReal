@@ -255,7 +255,9 @@ let compute_round (n: int) (ghost z: real) (zp: int)
 =
   let res = round_z_over_4 zp in (* res = (zp + 2)//4 *)
   (* Prove left *)
+  (*
   let ghost z' = zp - 2 in
+  *)
   assert { (from_int res -. 1.) <=. ((from_int zp) -. 2.) /. 4.
     by from_int res -. 1. 
     <=. ((from_int zp) +. 2.) *. _B (-1) -. 1.
@@ -446,12 +448,18 @@ let rec ghost function interp (t: term) : real =
 
 predicate wf_term (t: term) =
   match t with
-  | Cst i -> True
+  | Cst _ -> True
   | Add t t' -> (wf_term t) /\ (wf_term t')
   | Neg t -> (wf_term t)
   | Sub t t' -> (wf_term t) /\ (wf_term t')
   | Sqrt t -> (wf_term t) /\ (interp t >=. 0.)
   end
+
+(*
+let lemma (t: term) (n: int) (z: int) : unit
+  requires { True }
+  ensures { 
+*)
 
 let rec compute (t: term) (n: int) : int
   requires { wf_term t }
@@ -460,39 +468,19 @@ let rec compute (t: term) (n: int) : int
 =
   match t with
   | Cst i -> 
-    let res = compute_cst n i in
-    assert { framing (interp t) res n };
-      (*
       compute_cst n i
-      *) res
   | Add t1 t2 -> 
     let x1 = compute t1 (n+1) in
     let x2 = compute t2 (n+1) in
-    let res = compute_add n (interp t1) x1 (interp t2) x2 in
-      assert { framing (interp t) res n };
-      (*
       compute_add n (interp t1) x1 (interp t2) x2
-      *) res
   | Neg t' -> 
     let x = compute t' n in
-    let res = compute_neg n (interp t') x in
-      assert { framing (interp t) res n };
-      (*
       compute_neg n (interp t') x
-      *) res
   | Sub t1 t2 ->
     let x1 = compute t1 (n+1) in
     let x2 = compute t2 (n+1) in
-    let res = compute_sub n (interp t1) x1 (interp t2) x2 in
-      assert { framing (interp t) res n };
-      (*
       compute_sub n (interp t1) x1 (interp t2) x2
-      *) res
   | Sqrt t' -> 
     let x = compute t' (2*n) in
-    let res = compute_sqrt n (interp t') x in
-      assert { framing (interp t) res n };
-      (*
       compute_sqrt n (interp t') x
-      *) res
   end
