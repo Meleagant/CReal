@@ -455,12 +455,6 @@ predicate wf_term (t: term) =
   | Sqrt t -> (wf_term t) /\ (interp t >=. 0.)
   end
 
-(*
-let lemma (t: term) (n: int) (z: int) : unit
-  requires { True }
-  ensures { 
-*)
-
 let rec compute (t: term) (n: int) : int
   requires { wf_term t }
   variant { t }
@@ -484,3 +478,31 @@ let rec compute (t: term) (n: int) : int
     let x = compute t' (2*n) in
       compute_sqrt n (interp t') x
   end
+ 
+let lemma div_a_b_plus_1 (a: int) (b: int) : unit
+  requires { a > 0 }
+  requires { b > 0 }
+  requires { ED.div a  b < b }
+  ensures { ED.div a (b+1) = 
+      if (ED.mod a b) < (ED.div a b) then 
+        (ED.div a b) -1
+      else
+        (ED.div a b) }
+= 
+  let ghost y = ED.div a b in
+  let ghost z = ED.mod a b in
+  assert { a = y * b + z };
+  assert { a = y * (b+1) + z - y};
+  if y < z then
+  begin
+    assert { b > z - y >= 0 };
+    let ghost _ = euclid_uniq a (b+1) y in
+    assert { ED.div a (b+1) = y
+      by a = y * b + z
+      so a = y * (b + 1) + ( z - y) };
+    ()
+  end
+  else
+    (* assert { a = *)
+    ()
+             
