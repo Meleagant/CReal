@@ -400,6 +400,18 @@ let lemma sqrt_floor (n: int) : unit
     Question 18
   ---------------------------------------------*)
 
+let lemma sqrt_str_inc (x y: real) : unit
+  requires { x >=. 0.}
+  requires { y >=. 0.}
+  requires { x >. y}
+  ensures { sqrt x >. sqrt y }
+= 
+  assert { sqrt x >=. sqrt y };
+  assert { sqrt x <> sqrt y };
+  ()
+
+
+
 let compute_sqrt (n: int) (ghost x : real) (xp : int)
   requires { 0. <=. x }
   requires { framing x xp (2*n) }
@@ -412,17 +424,22 @@ let compute_sqrt (n: int) (ghost x : real) (xp : int)
   end
   else
     let ghost res = isqrt xp in
+    let ghost _ = sqrt_floor xp in
     assert { res = floor (sqrt (from_int xp)) };
-    let ghost _ = question9 (x -. 1.) (-n) in
-    assert { (sqrt ( x -. 1.)) *. (_B (-n))
-      = sqrt ( (x -. -1.) *. (_B (-2*n)))
-      <. sqrt (from_int xp)
-      <. sqrt ( (x +. -1.) *. (_B (-2*n)))
-      =  (sqrt ( x +. 1.)) *. (_B (-n)) 
+    assert { res - 1 <=  floor (sqrt (from_int xp -. 1.)) };
+    assert { from_int (res - 1) *. _B(-n) 
+        <=. from_int (floor (sqrt (from_int xp -. 1.))) *. _B(-n)
+        <=. (sqrt (from_int xp -. 1.)) *. _B(-n)
+        = sqrt ( (from_int (xp) -. 1. ) *. _B(-(2*n)))
+        <. sqrt x
+        <. sqrt ( (from_int (xp) +. 1. ) *. _B(-(2*n)))
+        = (sqrt (from_int xp +. 1.)) *. _B(-n)
+        <=. from_int (ceil (sqrt (from_int xp +. 1.))) *. _B(-n)
+        <=. from_int (res + 1) *. _B(-n) 
+      by ( (from_int (xp) -. 1. ) *. _B(-(2*n)))
+        <. x
+        <. ( (from_int (xp) +. 1. ) *. _B(-(2*n)))
       };
-    assert { sqrt (x -. 1.) <. sqrt x };
-    assert { (sqrt (x -. 1.) +. 1. ) <. sqrt x +. 1. };
-    assert { framing (sqrt x) res n };
     isqrt xp
 
 
@@ -493,16 +510,80 @@ let lemma div_a_b_plus_1 (a: int) (b: int) : unit
   let ghost z = ED.mod a b in
   assert { a = y * b + z };
   assert { a = y * (b+1) + z - y};
-  if y < z then
+  if z < y then
   begin
-    assert { b > z - y >= 0 };
-    let ghost _ = euclid_uniq a (b+1) y in
-    assert { ED.div a (b+1) = y
-      by a = y * b + z
-      so a = y * (b + 1) + ( z - y) };
+    assert { a = (y-1)*(b+1) -y + b + 1 +z }; 
+    assert { b + 1 + z - y >= 0 };
+    let ghost _ = euclid_uniq a (b+1) (y-1) in
+    assert { ED.div a (b+1) = y - 1 };
     ()
   end
   else
-    (* assert { a = *)
+  begin
+    assert { (b + 1) * y <= a 
+      by b > z - y >= 0 };
+    let ghost _ = euclid_uniq a (b+1) y in
+    assert { ED.div a (b+1) = y };
     ()
-             
+  end
+
+let lemma div_a_b_minus_1 (a: int) (b: int) : unit
+  requires { a > 0 }
+  requires { b > 1 }
+  requires { ED.div a b < b - 1 }
+  ensures { ED.div a (b-1) = 
+    if ED.mod a b >= b - 1 - (ED.div a b) then
+      (ED.div a b) + 1
+    else
+      ED.div a b }
+=
+  let ghost y = ED.div a b in
+  let ghost z = ED.mod a b in
+  assert { a = y * b + z };
+  assert { a = y * (b - 1) + z + y};
+  if z >= b - 1 - y then
+  begin
+    assert { a = (y+1)*(b-1) + z + y - b + 1};
+    let ghost _ = euclid_uniq a (b-1) (y+1) in
+    ()
+  end
+  else 
+  begin
+    (*
+    assert { z+y < b - 1};
+    *)
+    let ghost _ = euclid_uniq a (b-1) y in
+    ()
+  end
+
+(*
+let inv_simple_simple (ghost x: real) (p: int) (n: int)
+  requires { framing x p (n+1) }
+  requires { 0 <= n }
+  requires { 1. <=. x }
+  ensures { framing (inv x) result n }
+=
+  let k = n + 1 in
+  (* Prove pre-condition of ediv_mod *)
+  assert { (from_int p) >. (x -. 1.) *. _B(-(n+1))
+    by framing x p (n+1) };
+  assert { p > 0 
+    by x -. 1. >=. 0.
+    so (x -. 1.) *. _B(-(n+1)) >=. 0.
+    so (from_int p) >. (x -. 1.) *. _B(-(n+1)) >=. 0. };
+  let d, r = ediv_mod (power2 (2*(n+k))) p in
+  if 2*r <= p then
+  begin
+    assert{ p = (power 4 (2*n + 1))*d + r 
+      by 2*n+1 = n + k
+      so power 4 (2*n+1) 
+        = power 4 (n+k)
+        = power 2 2*(n+k) };
+    d
+  end
+  else
+    d + 1
+
+*)
+
+  
