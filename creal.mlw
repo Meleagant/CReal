@@ -556,7 +556,18 @@ let lemma div_a_b_minus_1 (a: int) (b: int) : unit
     ()
   end
 
-(*
+
+let lemma inv_str_decr (x y: real) : unit
+  requires { x >. 0. }
+  requires { y >. 0. }
+  requires { x >. y }
+  ensures { inv x <. inv y }
+= 
+  assert { inv x <=. inv y };
+  assert { inv x <> inv y };
+  ()
+
+
 let inv_simple_simple (ghost x: real) (p: int) (n: int)
   requires { framing x p (n+1) }
   requires { 0 <= n }
@@ -584,6 +595,11 @@ let inv_simple_simple (ghost x: real) (p: int) (n: int)
   else
     d + 1
 
-*)
+
+
+
+
+
+
 
   
