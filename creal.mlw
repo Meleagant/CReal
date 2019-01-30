@@ -575,21 +575,42 @@ let inv_simple_simple (ghost x: real) (p: int) (n: int)
   ensures { framing (inv x) result n }
 =
   let k = n + 1 in
-  (* Prove pre-condition of ediv_mod *)
-  assert { (from_int p) >. (x -. 1.) *. _B(-(n+1))
-    by framing x p (n+1) };
-  assert { p > 0 
-    by x -. 1. >=. 0.
-    so (x -. 1.) *. _B(-(n+1)) >=. 0.
-    so (from_int p) >. (x -. 1.) *. _B(-(n+1)) >=. 0. };
-  let d, r = ediv_mod (power2 (2*(n+k))) p in
+  let puiss = power2 (2*(n+k)) in
+  assert { puiss = power 4 (2*n+1)
+    by 2*n+1 = n + k
+    so power 2 (2*(n+k))
+      = power (power 2 2) (n+k)
+      = power 4 (n+k)
+      = power 4 (2*n+1)
+    so power 4 (2*n+1) 
+      = power 2 (2*(n+k)) };
+      
+  assert { p > 0
+    by n >= 0
+    so 1. >=. pow 4.0 (from_int (-(n+1)))
+      = _B(-(n+1))
+      >. 0.
+    so ((from_int p) +. 1.)
+      >=. 0.
+    so ((from_int p) +. 1.)
+      = ((from_int p) +. 1.) *. 1.
+      >=. ((from_int p) +. 1.) *. _B (-(n+1))
+      >. x >=. 1.
+    so (from_int p) +. 1. >. 1.
+    so from_int p >. 0. }; 
+  let d, r = ediv_mod puiss p in
   if 2*r <= p then
   begin
-    assert{ p = (power 4 (2*n + 1))*d + r 
-      by 2*n+1 = n + k
-      so power 4 (2*n+1) 
-        = power 4 (n+k)
-        = power 2 2*(n+k) };
+    assert{ puiss = p * d + r 
+      by d
+        = ED.div (power 2 (2*(n+k))) p
+        = ED.div (power 4 (2*n + 1)) p 
+      so r
+        = ED.mod (power 2 (2*(n+k))) p
+        = ED.mod (power 4 (2*n + 1)) p
+      so d = ED.div puiss p
+      so r = ED.mod puiss p
+      so p <> 0  };
     d
   end
   else
