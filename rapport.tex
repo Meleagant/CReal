@@ -1,0 +1,252 @@
+\documentclass[9pt,a4paper,twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[greek,french]{babel}
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{xargs}
+
+% \usepackage[pagewise]{lineno}
+% \linenumbers
+
+%\usepackage{setspace}
+%\setstretch{1,5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%    Pour les graphes %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tikz,pgf}
+\usetikzlibrary{arrows,automata} % Pour les graphe
+\tikzset{every picture/.style={execute at begin picture={%
+   \shorthandoff{:;!?};}
+}}
+\usepackage{pgf-umlsd}
+\usepackage{minted}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%     Pour les figures    %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{epsfig}
+%\usepackage{slashbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%    Pour les théorêmes et tout...    %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath,amsthm}
+\theoremstyle{definition}
+\newtheorem{theorem}{Th\'eor\`eme}
+\newtheorem{hypo}{Hypoth\`ese}
+\newtheorem{definition}{Définition}
+\newtheorem{lemma}{Lemme}
+\newtheorem{hyp}{Hypoth\`ese}
+\usepackage{stmaryrd}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%    Pour les thÃ©orÃªmes et tout...    %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath,amsthm}
+%\newtheorem{definition}
+% \usepackage{mathabx}
+
+% use biblatex for bib
+%\usepackage{biblatex}
+%\addbibresource{biblio.bib}
+
+\usepackage{multirow}
+
+\usepackage{caption}
+\captionsetup[table]{name=Tableau}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%    Pour une belle mise en page     %%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Grosses marges par défaut
+%\usepackage{geometry}
+% Marges extérieures pour l'annotation
+\usepackage[left=1.25cm, right=1.25cm,top = 1.5cm, bottom = 1.5cm]{geometry}
+% Pas de marges pour la version finale
+%\usepackage[left=1.5cm, right=3.5cm,top = 2.5cm, bottom = 2.5cm]{geometry}
+% TODO : penser à remettr correctement les marges
+%\setlength{\hoffset}{-18pt}
+% \setlength{\oddsidemargin}{0cm}   % Marge gauche sur pages impaires
+% \setlength{\evensidemargin}{4 cm}  % Marge gauche sur pages paires
+% \setlength{\marginparwidth}{4cm} % Largeur de note dans la marge
+% \setlength{\textwidth}{452pt}     % Largeur de la zone de texte (17cm)
+% \setlength{\voffset}{-18pt}       % Bon pour DOS
+% \setlength{\marginparsep}{4cm}    % SÃ©paration de la marge
+% \setlength{\topmargin}{0pt}       % Pas de marge en haut
+% \setlength{\headheight}{13pt}     % Haut de page
+% \setlength{\headsep}{10pt}        % Entre le haut de page et le texte
+% \setlength{\footskip}{27pt}       % Bas de page + sÃ©paration
+% \setlength{\textheight}{650pt}    % Hauteur de la zone de texte (25cm)
+%
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{lastpage}
+\renewcommand{\headrulewidth}{1pt}
+\fancyhead[L]{Interprétation abstraite d'automates par l'analyseur \astree{}}
+\fancyhead[R]{J. \textsc{Giet}}
+\fancyfoot[C]{\thepage/\pageref{LastPage}}
+
+%\renewcommand*\rmdefault{ppl}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%          Raccourcis usuels         %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%   Symboles mathÃ©matiques %%%%%%
+\newcommand{\K}{\ensuremath\mathbb{K}}
+\newcommand{\N}{\ensuremath\mathbb{N}}
+\newcommand{\Z}{\ensuremath\mathbb{Z}}
+\newcommand{\D}{\ensuremath\mathbb{D}}
+\newcommand{\Q}{\ensuremath\mathbb{Q}}
+\newcommand{\R}{\ensuremath\mathbb{R}}
+\newcommand{\M}{\ensuremath\mathbb{M}}
+\renewcommand{\L}{\ensuremath\mathbb{L}}
+\newcommand{\U}{\ensuremath\mathbb{U}}
+\newcommand{\C}{\ensuremath\mathbb{C}}
+\newcommand{\E}{\ensuremath\mathbb{E}}
+\newcommand{\V}{\ensuremath\mathbb{V}}
+\renewcommand{\O}{\ensuremath\mathcal{O}}
+\renewcommand{\P}{\mathcal{P}}
+\newcommand{\A}{\mathcal{A}}
+\renewcommand{\a}{{\scriptscriptstyle\mathcal{A}}}
+\renewcommand{\S}{\mathcal{S}}
+
+%%%%% DEs raccourcis propres au projet
+\newcommand{\reduc}{\textbf{reduc}}
+\newcommand{\trans}{\textbf{trans}}
+\newcommand{\guard}{\textbf{guard}}
+\newcommand{\defi}{\text{def.}}
+
+%%%%%  ParenthÃ¨ses & autres %%%%%%
+\newcommand{\po}{\left(} % grande parenthÃ¨se ouvrante
+\newcommand{\pf}{\right)} % grande parenthÃ¨se fermante
+\newcommand{\ao}{\left\lbrace}
+\newcommand{\af}{\right\rbrace}
+\newcommand{\dco}{\llbracket}
+\newcommand{\dcf}{\rrbracket}
+
+%%%% Raccourcis usuels   %%%%
+\newcommand{\ie}{\textit{i.e. }}
+\newcommand{\eg}{\textit{e.g. }}
+\newcommand{\cf}{\textit{cf. }}
+\newcommand{\ssi}{\text{ si et seulement si }}
+\newcommand{\si}{\text{ si }}
+
+%%%%  Pour le module math   %%%%
+\newcommand{\et}{\text{~et }}
+\newcommand{\ou}{\text{~ou }}
+\newcommand{\car}{\text{~car }}
+\newcommand{\avec}{\text{~avec }}
+
+%%%%  FlÃªches et autres  %%%%
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\emptyset}{\varnothing}
+\newcommand{\la}{\leftarrow}
+\newcommand{\xla}{\xleftarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\xra}{\xrightarrow}
+
+\newcommand{\TODO}{{\LARGE\textbf{\textit{TODO}}}}
+
+
+
+%%%% Pour la méta
+% \newcommand{\TODO}{\textgreek{\textbf{\color{red}TODO}}}
+% \newcommand{\Rq}{\textbf{\color{blue}Remarque(s)}}
+
+
+\renewcommand{\listingscaption}{Code}
+\renewcommand{\listoflistingscaption}{Table des fragments de code}
+% Définition de l'envirronement Code pour le OCaml
+\newenvironment{code}[1][ocaml]{%
+\newgeometry{textwidth = 0.8\textwidth}
+\VerbatimEnvironment\begin{minted}[linenos,
+frame=lines,
+framesep=2mm,
+%fontsize=\footnotesize,
+mathescape,
+autogobble]{#1}%
+}{%
+\end{minted}
+\restoregeometry
+}
+
+\usepackage[nottoc, notlof, notlot]{tocbibind}
+
+% Pour les numéros de section en chiffre romain
+\renewcommand{\thesection}{\Roman{section}}
+
+\title{CReal: Arithmétique en précision arbitraire}   % Mettre le titre iÃ§i!!
+\author{Josselin \textsc{Giet}}  % Renseigner le nom de l'auteur
+%\date{}    % Par dÃ©faut ,on ne met pas de date
+%\date{}
+% SOn commente cette ligne en dessus pour savoir les dates de compilation
+
+\begin{document}
+\maketitle
+
+\section*{Introduction}
+\TODO
+\tableofcontents
+
+\section{Axioms}
+
+%----------------------------------------------------------------------------
+% II. function on integers
+%----------------------------------------------------------------------------
+\section{Functions on integers}
+
+% I.1. power2
+\textbf{II.1}
+Cette question n'a pas présenté de grandes difficultés.
+J'utilise une version itérative « naïve » de l'exponentielle pour
+calculer $2^n$.
+\TODO : Un truc sur l'ensure en plus...
+
+\textbf{II.2}
+Une fois donnée la définition de la fonction \texttt{power2}, la défnition de
+\texttt{shift\_left} est immédiate.
+
+\textbf{II.3}
+Pour la division euclidienne \texttt{ediv\_mod}, j'ai dû faire une disjonction
+de cas selon le signe du dividende \texttt{x}.
+Chaque cas se fait de manière itérative : on maintient un compteur \texttt{d}
+et un accumulateur \texttt{r} pour le reste.
+
+\textbf{II.4}
+De même que pour la question I.2, la fonction \texttt{shift\_right} est définie
+sans problèmes en utilisant la divsion euclidienne de la fonction 
+précédente.
+
+\textbf{II.5}
+Pour la fonction \texttt{isqrt}, j'ai fait une version itérative proche de 
+celle dans l'exercice du cours à une exception près : la conition d'arrêt de 
+la boucle \texttt{while} se fait en testant l'inégalité pour \texttt{!res + 1}.
+
+\section{Difficulty of Non-linear Arithmetic on Reals}
+
+\textbf{III.6-12} 
+Pour ces questions, je me suis contenté d'écrire les lemmes sous forme de
+fonctions \texttt{ghost}. La seule \textit{difficulté} rencontrée fût dans la
+question 9, où j'ai dû rajouter un \texttt{assert}.
+
+
+
+
+%\newpage
+%\tableofcontents
+%\listoflistings
+%\listoffigures
+%\listoftables
+%\newpage
+
+
+\end{document}
