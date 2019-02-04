@@ -41,13 +41,10 @@
 \newtheorem{lemma}{Lemme}
 \newtheorem{hyp}{Hypoth\`ese}
 \usepackage{stmaryrd}
+\usepackage{mathtools}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%    Pour les thÃ©orÃªmes et tout...    %%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{amsmath,amsthm}
-%\newtheorem{definition}
-% \usepackage{mathabx}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 % use biblatex for bib
 %\usepackage{biblatex}
@@ -110,6 +107,7 @@
 \newcommand{\C}{\ensuremath\mathbb{C}}
 \newcommand{\E}{\ensuremath\mathbb{E}}
 \newcommand{\V}{\ensuremath\mathbb{V}}
+\newcommand{\B}{\texttt{\_B}}
 \renewcommand{\O}{\ensuremath\mathcal{O}}
 \renewcommand{\P}{\mathcal{P}}
 \newcommand{\A}{\mathcal{A}}
@@ -154,7 +152,8 @@
 \newcommand{\ra}{\rightarrow}
 \newcommand{\xra}{\xrightarrow}
 
-\newcommand{\TODO}{{\LARGE\textbf{\textit{TODO}}}}
+\usepackage{xcolor}
+\newcommand{\TODO}{{\color{red}\textbf{\textit{TODO}}}}
 
 
 
@@ -195,7 +194,7 @@ autogobble]{#1}%
 
 \section*{Introduction}
 \TODO
-\tableofcontents
+%\tableofcontents
 
 \section{Axioms}
 
@@ -209,7 +208,10 @@ autogobble]{#1}%
 Cette question n'a pas présenté de grandes difficultés.
 J'utilise une version itérative « naïve » de l'exponentielle pour
 calculer $2^n$.
-\TODO : Un truc sur l'ensure en plus...
+J'ai aussi rajouter un \texttt{ensures} de plus sur le résultat : 
+il est strictement positif.
+Cela a été nécessaire dans la question \textbf{II.4} afin de montrer que 
+$2^\ell > 0$
 
 \textbf{II.2}
 Une fois donnée la définition de la fonction \texttt{power2}, la défnition de
@@ -234,9 +236,87 @@ la boucle \texttt{while} se fait en testant l'inégalité pour \texttt{!res + 1}
 \section{Difficulty of Non-linear Arithmetic on Reals}
 
 \textbf{III.6-12} 
-Pour ces questions, je me suis contenté d'écrire les lemmes sous forme de
-fonctions \texttt{ghost}. La seule \textit{difficulté} rencontrée fût dans la
-question 9, où j'ai dû rajouter un \texttt{assert}.
+Pour ces questions, j'ai tout simplement les lemmes sous forme de
+\textit{function lemmas} et les solveurs ont prouvé facilement ces lemmes.
+La seule \textit{difficulté} rencontrée fût dans la question \textbf{III.9}, 
+où j'ai dû rajouter un \texttt{assert} dans le corps de la fonction pour 
+montrer que $\sqrt{\B(2n)} = \B(n)$.
+
+\textbf{III.13}
+
+Dans \TODO il y a deux deux définitions equvalentes de \texttt{framing} : 
+\begin{align}
+\forall x \in \R, p, n \in \Z,\  \nonumber
+	& \texttt{framing}\ x\ p\ n \\ 
+\Longleftrightarrow \ \
+	& \left( p-1 \right) \cdot 4^{-n} 
+		< x <
+		\left( p+1 \right) \cdot 4^{-n} 
+	\label{eq:fram-1} \\
+\Longleftrightarrow \ \
+	& |x-p\cdot 4^{-n}| < 4^{-n}
+	\label{eq:fram-2}
+\end{align}
+
+La définition \ref{eq:fram-1} est préférable à \ref{eq:fram-2} car elle fait
+intervenir moins de fonctions non-linéaires.
+En effet, il n'y a pas de de valeurs absolues dans la première définition.
+
+\section{Computational Real}
+
+\textbf{IV.14}
+Pour la fonction \texttt{round\_z\_over\_4}, j'ai prouvé les deux inégalités
+séparément. Pour l'inégalité de gauche, la préuve se  base sur le fait que : 
+$$
+	(z-2)\B(-1)
+	= \frac{z-2}{4} 
+	< \floor*{ \frac{z - 2}{4} + 1 }
+	= \floor*{ \frac{z+2}{4} }
+$$ 
+et pour celle de droite : 
+$$
+\floor*{ \frac{z + 2}{4} }
+	\leq \frac{z+2}{4}
+	= (z + 2)\B(-1)
+$$
+
+Pour la fonction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

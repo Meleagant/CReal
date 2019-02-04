@@ -236,14 +236,13 @@ let round_z_over_4 (z: int)
             <. from_int result
             <=. ((from_int z) +. 2.) *. (_B (-1)) }
 =
-  let ghost z' = z - 2 in
-  (* Prove of left *)
+  (* Prove of right *)
   assert { from_int (ED.div (z + 2) 4) <=. (from_int (z+2)) /. 4.  
       by ((from_int z) +. 2.) *. (_B (-1)) = ((from_int z) +. 2.) /. 4. } ;
-  (* Prove of right *)
+  (* Prove of left *)
   assert { ((from_int z) -. 2.) /. 4. <. from_int (ED.div (z + 2) 4) 
-    by ED.div (z - 2) 4 < ED.div (z + 2) 4
-    so from_int z' /. 4. <. from_int (ED.div z' 4 + 1) };
+    by ED.div (z - 2) 4 + 1 = ED.div (z + 2) 4
+    so from_int (z-2) /. 4. <. from_int (ED.div (z-2) 4 + 1) };
   shift_right (z + 2) 2 
 
 
@@ -255,9 +254,6 @@ let compute_round (n: int) (ghost z: real) (zp: int)
 =
   let res = round_z_over_4 zp in (* res = (zp + 2)//4 *)
   (* Prove left *)
-  (*
-  let ghost z' = zp - 2 in
-  *)
   assert { (from_int res -. 1.) <=. ((from_int zp) -. 2.) /. 4.
     by from_int res -. 1. 
     <=. ((from_int zp) +. 2.) *. _B (-1) -. 1.
