@@ -1,3 +1,4 @@
+LTXMK = latexmk -pdf -shell-escape -file-line-error --interaction=nonstopmode
 
 all:
-	latexmk -pdf -shell-escape rapport.tex
+	$(LTXMK) rapport.tex

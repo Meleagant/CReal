@@ -84,7 +84,7 @@
 \pagestyle{fancy}
 \usepackage{lastpage}
 \renewcommand{\headrulewidth}{1pt}
-\fancyhead[L]{Interprétation abstraite d'automates par l'analyseur \astree{}}
+\fancyhead[L]{CReal}
 \fancyhead[R]{J. \textsc{Giet}}
 \fancyfoot[C]{\thepage/\pageref{LastPage}}
 
@@ -167,10 +167,11 @@
 % Définition de l'envirronement Code pour le OCaml
 \newenvironment{code}[1][ocaml]{%
 \newgeometry{textwidth = 0.8\textwidth}
-\VerbatimEnvironment\begin{minted}[linenos,
+\VerbatimEnvironment\begin{minted}[
+%linenos,
 frame=lines,
 framesep=2mm,
-%fontsize=\footnotesize,
+fontsize=\footnotesize,
 mathescape,
 autogobble]{#1}%
 }{%
@@ -208,10 +209,16 @@ autogobble]{#1}%
 Cette question n'a pas présenté de grandes difficultés.
 J'utilise une version itérative « naïve » de l'exponentielle pour
 calculer $2^n$.
-J'ai aussi rajouter un \texttt{ensures} de plus sur le résultat : 
+J'ai aussi rajouter un \texttt{ensures} de plus sur le résultat :
 il est strictement positif.
-Cela a été nécessaire dans la question \textbf{II.4} afin de montrer que 
+Cela a été nécessaire dans la question \textbf{II.4} afin de montrer que
 $2^\ell > 0$
+
+\begin{listing}[H]
+\begin{code}[ocaml]
+	let i = ref 33 in incr i; !i
+\end{code}
+\end{listing}
 
 \textbf{II.2}
 Une fois donnée la définition de la fonction \texttt{power2}, la défnition de
@@ -225,33 +232,33 @@ et un accumulateur \texttt{r} pour le reste.
 
 \textbf{II.4}
 De même que pour la question I.2, la fonction \texttt{shift\_right} est définie
-sans problèmes en utilisant la divsion euclidienne de la fonction 
+sans problèmes en utilisant la divsion euclidienne de la fonction
 précédente.
 
 \textbf{II.5}
-Pour la fonction \texttt{isqrt}, j'ai fait une version itérative proche de 
-celle dans l'exercice du cours à une exception près : la conition d'arrêt de 
+Pour la fonction \texttt{isqrt}, j'ai fait une version itérative proche de
+celle dans l'exercice du cours à une exception près : la conition d'arrêt de
 la boucle \texttt{while} se fait en testant l'inégalité pour \texttt{!res + 1}.
 
 \section{Difficulty of Non-linear Arithmetic on Reals}
 
-\textbf{III.6-12} 
+\textbf{III.6-12}
 Pour ces questions, j'ai tout simplement les lemmes sous forme de
 \textit{function lemmas} et les solveurs ont prouvé facilement ces lemmes.
-La seule \textit{difficulté} rencontrée fût dans la question \textbf{III.9}, 
-où j'ai dû rajouter un \texttt{assert} dans le corps de la fonction pour 
+La seule \textit{difficulté} rencontrée fût dans la question \textbf{III.9},
+où j'ai dû rajouter un \texttt{assert} dans le corps de la fonction pour
 montrer que $\sqrt{\B(2n)} = \B(n)$.
 
 \textbf{III.13}
 
-Dans \TODO il y a deux deux définitions equvalentes de \texttt{framing} : 
+Dans \TODO il y a deux deux définitions equvalentes de \texttt{framing} :
 \begin{align}
 \forall x \in \R, p, n \in \Z,\  \nonumber
-	& \texttt{framing}\ x\ p\ n \\ 
+	& \texttt{framing}\ x\ p\ n \\
 \Longleftrightarrow \ \
-	& \left( p-1 \right) \cdot 4^{-n} 
+	& \left( p-1 \right) \cdot 4^{-n}
 		< x <
-		\left( p+1 \right) \cdot 4^{-n} 
+		\left( p+1 \right) \cdot 4^{-n}
 	\label{eq:fram-1} \\
 \Longleftrightarrow \ \
 	& |x-p\cdot 4^{-n}| < 4^{-n}
@@ -266,14 +273,14 @@ En effet, il n'y a pas de de valeurs absolues dans la première définition.
 
 \textbf{IV.14}
 Pour la fonction \texttt{round\_z\_over\_4}, j'ai prouvé les deux inégalités
-séparément. Pour l'inégalité de gauche, la préuve se  base sur le fait que : 
+séparément. Pour l'inégalité de gauche, la préuve se  base sur le fait que :
 $$
 	(z-2)\B(-1)
-	= \frac{z-2}{4} 
+	= \frac{z-2}{4}
 	< \floor*{ \frac{z - 2}{4} + 1 }
 	= \floor*{ \frac{z+2}{4} }
-$$ 
-et pour celle de droite : 
+$$
+et pour celle de droite :
 $$
 \floor*{ \frac{z + 2}{4} }
 	\leq \frac{z+2}{4}
