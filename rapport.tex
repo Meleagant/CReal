@@ -61,7 +61,7 @@
 % Grosses marges par défaut
 %\usepackage{geometry}
 % Marges extérieures pour l'annotation
-\usepackage[left=1.25cm, right=1.25cm,top = 1.5cm, bottom = 1.5cm]{geometry}
+\usepackage[left=1.25cm, right=1.25cm,top = 2.25cm, bottom = 2.25cm]{geometry}
 % Pas de marges pour la version finale
 %\usepackage[left=1.5cm, right=3.5cm,top = 2.5cm, bottom = 2.5cm]{geometry}
 % TODO : penser à remettr correctement les marges
@@ -161,7 +161,7 @@
 % \newcommand{\TODO}{\textgreek{\textbf{\color{red}TODO}}}
 % \newcommand{\Rq}{\textbf{\color{blue}Remarque(s)}}
 
-
+\usemintedstyle{emacs}
 \renewcommand{\listingscaption}{Code}
 \renewcommand{\listoflistingscaption}{Table des fragments de code}
 % Définition de l'envirronement Code pour le OCaml
@@ -195,9 +195,21 @@ autogobble]{#1}%
 
 \section*{Introduction}
 \TODO
-%\tableofcontents
+\tableofcontents
+\listoflistings
 
 \section{Axioms}
+
+
+J'ai ajouté de la manière suivante un axiome pour disposer de la stricte
+croissance de la fonction \texttt{log}
+\begin{listing}
+\begin{code}[ocaml]
+axiom log_incr:
+  forall x y: real. 0.0 <. x <. y -> (log x) <. (log y)
+\end{code}
+\caption{Axiome de la stricte croissance de \texttt{log}}
+\end{listing}
 
 %----------------------------------------------------------------------------
 % II. function on integers
@@ -206,44 +218,133 @@ autogobble]{#1}%
 
 % I.1. power2
 \textbf{II.1}
-Cette question n'a pas présenté de grandes difficultés.
 J'utilise une version itérative « naïve » de l'exponentielle pour
-calculer $2^n$.
+calculer $2^n$. Au début de la fonction je crée une référence sur la valeur
+\texttt{l} donnée en argument ainsi qu'une référence sur le futur résultat
+\texttt{res}, initialisée à 0. Dans une boucle \texttt{while}, je décrémente
+cette référence et je multiplie \texttt{res} par $2$.
+
+Dans cette boucle \texttt{while}, le variant est la référence \texttt{!x},
+et les invariants sont \texttt{!res * power 2 !x = power 2 l}, pour prouver
+le bon résultat et \texttt{!x >= 0} afin d'inférer à la fin de la boucle que
+\texttt{!x=0}.
+
+
 J'ai aussi rajouter un \texttt{ensures} de plus sur le résultat :
-il est strictement positif.
+il est strictement positif et donc un invariant sur la référence du futur
+résultat : \texttt{!res > 0}.
 Cela a été nécessaire dans la question \textbf{II.4} afin de montrer que
 $2^\ell > 0$
 
-\begin{listing}[H]
+\begin{listing}
 \begin{code}[ocaml]
-	let i = ref 33 in incr i; !i
+  let power2 (l:int) : int
+    requires { 0 <= l }
+    ensures { result = power 2 l }
+    ensures { result > 0 }
 \end{code}
+  \label{lst:power2}
+  \caption{Contrat de la fonction \texttt{power2}}
 \end{listing}
 
 \textbf{II.2}
 Une fois donnée la définition de la fonction \texttt{power2}, la défnition de
 \texttt{shift\_left} est immédiate.
 
+\begin{listing}[H]
+\begin{code}[ocaml]
+  let shift_left (z: int) (l:int) : int
+    requires { 0 <= l }
+    ensures { result = z * (power 2 l) }
+    = z * power2 l
+\end{code}
+\label{lst:shiftleft}
+\caption{Code de la fonction \texttt{shift\_left}}
+\end{listing}
+
 \textbf{II.3}
 Pour la division euclidienne \texttt{ediv\_mod}, j'ai dû faire une disjonction
 de cas selon le signe du dividende \texttt{x}.
 Chaque cas se fait de manière itérative : on maintient un compteur \texttt{d}
 et un accumulateur \texttt{r} pour le reste.
+Ainsi dans chaque boucle on maintient l'invariant : \texttt{x = !d * y + !r}.
+
+Pour le premier cas (\texttt{x >= 0}) on retranche \texttt{y} à \texttt{!r}
+à chaque passage dans la boucle et on incrémente \texttt{!d} et ce tanty que
+\texttt{!r >= y}.
+Le variant est donc \texttt{!r - y}.
+Outre l'invariant commun aux deux cas, on maintient l'invariant \texttt{!r >= 0}
+pour déterminer après le passage dans la boucle que \texttt{ y > !r >= 0}.
+
+Dans l'autre cas (\texttt{x < 0}) on ajoute \texttt{y} à \texttt{!r} à chaque
+passage dans la boucle et on décrémente \texttt{!d} et ce tant que \texttt{!r < 0}.
+De même que dans le premier cas on maintient un invariant entre \texttt{!r} et
+\texttt{y} : \texttt{!r < y}, pour montrer après le passage dans la boucle que
+\texttt{ y > !r >= 0}.
+
+\begin{listing}
+\begin{code}[ocaml]
+let ediv_mod (x:int) (y:int) : (int, int)
+  requires { 0 < y }
+  ensures { let d,r = result in
+     d = ED.div x y /\ r = ED.mod x y }
+\end{code}
+\label{lst:edivmod}
+\caption{Contrat de la fonction \texttt{ediv\_mod}}
+\end{listing}
 
 \textbf{II.4}
 De même que pour la question I.2, la fonction \texttt{shift\_right} est définie
 sans problèmes en utilisant la divsion euclidienne de la fonction
 précédente.
 
+\begin{listing}
+\begin{code}[ocaml]
+let shift_right (z: int) (l:int) : int
+  requires { 0 <= l }
+  ensures { result = ED.div z (power 2 l) }
+=
+  let p2l = power2 l in
+  assert { p2l > 0 };
+  let d, _ = ediv_mod z p2l in
+    d
+\end{code}
+\label{lst:shiftright}
+\caption{Code de la fonction \texttt{shift\_right}}
+\end{listing}
+
 \textbf{II.5}
 Pour la fonction \texttt{isqrt}, j'ai fait une version itérative proche de
-celle dans l'exercice du cours à une exception près : la conition d'arrêt de
-la boucle \texttt{while} se fait en testant l'inégalité pour \texttt{!res + 1}.
+celle dans l'exercice du cours. Je crée une référence sur le futur résultat
+\texttt{res}, initialisée à 0, que j'incrémente tant que
+$
+(\texttt{!res} +1)^2 \leq \texttt{n}
+$.
+La variant de la boucle est donc \texttt{n - !res * ! res}.
+Les invariants sont \texttt{!res >= 0} et \texttt{ !res * !res <= n}.
+Je conclue la fonction en montrant l'inégalité qui est la définition de la
+fonction \texttt{floor}:
+$$
+(\texttt{!res} =)
+\sqrt{\texttt{!res}^2} \leq \sqrt{\texttt{n}}
+  < \sqrt{(\texttt{!res}+1)^2}
+  (=\texttt{!res}+1)
+$$
+
+\begin{listing}
+\begin{code}[ocaml]
+let function isqrt (n: int) : int
+  requires {0 <= n}
+  ensures { result = floor (sqrt (from_int n)) }
+\end{code}
+\label{lst:isqrt}
+\caption{Contrat de la fonction \texttt{isqrt}}
+\end{listing}
 
 \section{Difficulty of Non-linear Arithmetic on Reals}
 
 \textbf{III.6-12}
-Pour ces questions, j'ai tout simplement les lemmes sous forme de
+Pour ces questions, j'ai écrit les lemmes sous forme de
 \textit{function lemmas} et les solveurs ont prouvé facilement ces lemmes.
 La seule \textit{difficulté} rencontrée fût dans la question \textbf{III.9},
 où j'ai dû rajouter un \texttt{assert} dans le corps de la fonction pour
@@ -271,9 +372,12 @@ En effet, il n'y a pas de de valeurs absolues dans la première définition.
 
 \section{Computational Real}
 
+\subsection{Addition}
+
+
 \textbf{IV.14}
 Pour la fonction \texttt{round\_z\_over\_4}, j'ai prouvé les deux inégalités
-séparément. Pour l'inégalité de gauche, la préuve se  base sur le fait que :
+séparément. Pour l'inégalité de gauche, la preuve se  base sur le fait que :
 $$
 	(z-2)\B(-1)
 	= \frac{z-2}{4}
@@ -287,16 +391,84 @@ $$
 	= (z + 2)\B(-1)
 $$
 
-Pour la fonction
+\begin{listing}
+\begin{code}[ocaml]
+let round_z_over_4 (z: int)
+  ensures { ((from_int z) -. 2.) *. (_B (-1))
+            <. from_int result
+            <=. ((from_int z) +. 2.) *. (_B (-1)) }
+\end{code}
+\label{lst:roundzover4}
+\caption{Contrat de la fonction \texttt{round\_z\_over\_4}}
+\end{listing}
+
+Pour la fonction \texttt{compute\_round}, j'ai aussi prouvé séparément les deux
+inégalités.
+Celle de gauche se montre en remarquant que :
+
+$$
+\floor*{\frac{\texttt{zp} + 2}{4}} - 1
+\leq \frac{\texttt{zp} -2}{4}
+$$
+et donc :
+\begin{align*}
+\left(\floor*{\frac{\texttt{zp} + 2}{4}} - 1\right) \cdot \B(-n)
+  &\leq \frac{\texttt{zp} -2}{4} \cdot \B(-n)\\
+  &= (\texttt{zp} -2)\cdot \B(-(n+1))\\
+  &< z
+\end{align*}
+
+Pour l'inégalité de droite, on a plus simplement :
+\begin{align*}
+z &\leq \texttt{zp}\cdot\B(-(n+1)) \\
+  &\leq (\texttt{zp}+2)\cdot\B(-(n+1)) \\
+  &= \frac{\texttt{zp}+2}{4}\cdot\B(-n)\\
+  &< \left(\floor*{\frac{\texttt{zp} + 2}{4}} + 1\right) \cdot \B(-n)\\
+\end{align*}
+
+\begin{listing}
+\begin{code}[ocaml]
+let compute_round (n: int) (ghost z: real) (zp: int)
+  requires {  ((from_int zp) -. 2.) *. (_B (-(n+1)))
+            <. z
+            <=. ((from_int zp) +. 2.) *. (_B (-(n+1))) }
+  ensures { framing z result n }
+\end{code}
+\label{lst:roundzover4}
+\caption{Contrat de la fonction \texttt{compute\_round}}
+\end{listing}
 
 
+Enfin, pour la fonction \texttt{compute\_add}, les preuves ont été automatiquement
+inférées par les solveurs.
 
+\begin{listing}
+\begin{code}[ocaml]
+let compute_add (n: int) (ghost x: real)
+  (xp: int) (ghost y: real) (yp: int)
+  requires { framing x xp (n+1) }
+  requires { framing y yp (n+1) }
+  ensures { framing (x+.y) result n }
+= compute_round n (x +. y) (xp + yp)
+\end{code}
+\label{lst:computeadd}
+\caption{Contrat de la fonction \texttt{compute\_add}}
+\end{listing}
 
+\subsection{Substraction}
 
+\textbf{IV.15}
+De même, la fonction \texttt{compute\_neg} est automatiquement prouvée par les solveurs.
 
-
-
-
+\begin{listing}
+\begin{code}[ocaml]
+  let compute_neg (n: int) (ghost x: real) (xp: int)
+    requires { framing x xp n }
+    ensures  { framing (-. x) result n }
+  = - xp
+\end{code}
+\caption{Code de la fonction \texttt{compute\_neg}}
+\end{listing}
 
 
 
