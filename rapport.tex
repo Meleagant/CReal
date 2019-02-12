@@ -470,10 +470,86 @@ De même, la fonction \texttt{compute\_neg} est automatiquement prouvée par les
 \caption{Code de la fonction \texttt{compute\_neg}}
 \end{listing}
 
+\textbf{IV.16}
+En utilisant les fonctions \texttt{compute\_add} et \texttt{compute\_neg}
+on obtient naturellement le code de la fonction \texttt{compute\_sub}.
+De même que pour la fonction \texttt{Compute\_add}, il faut une hypothèse de
+\texttt{framing} à l'ordre $n+1$ pour avoir une précision à l'ordre $n$ sur le
+résultat
 
+\begin{listing}
+\begin{code}[ocaml]
+   let compute_sub (n: int) (ghost x: real)
+     (xp: int) (ghost y: real) (yp: int)
+     requires { framing x xp (n+1) }
+     requires { framing y yp (n+1) }
+     ensures { framing (x -. y) result n }
+   =
+     compute_add n x xp (-. y) (compute_neg (n+1) y yp)
+\end{code}
+\caption{Code de la fonction \texttt{compute\_sub}}
+\end{listing}
 
+\subsection{Conversion}
 
+Bien que n'étant pas une fonction à proprement parler, la preuve de la fonction
+\texttt{compute\_cst} a nécessité des \texttt{asserts} pour guider les solveurs
+dans le cas \texttt{n < 0}. Les uatres cas (\texttt{n = 0} et \texttt{n > 0})
+ont été prouvés sans problèmes par les solveurs.
+Encore une fois, la preuve s'est faite en prouvant séparément les inégalités.
 
+Pour celle de gauche :
+
+\begin{align*}
+   &\floor*{\frac{\texttt{x}}{4^{-\texttt{n}}}}\cdot 4^{-\texttt{n}}
+      \leq x\\
+\Rightarrow
+   &\left(\floor*{\frac{\texttt{x}}{4^{-\texttt{n}}}}-1\right)\cdot 4^{-\texttt{n}}
+      < x\\
+\end{align*}
+
+Et pour celle de droite :
+
+\begin{align*}
+   &\floor*{\frac{\texttt{x}}{4^{-\texttt{n}}}}\cdot 4^{-\texttt{n}}
+      + \underbrace{\texttt{x} \mod 4^{-\texttt{n}}}_{<4^{-\texttt{n}}} \\
+   &< \floor*{\frac{\texttt{x}}{4^{-\texttt{n}}}}\cdot 4^{-\texttt{n}}
+      + 4^{-\texttt{n}} \\
+   & = \left(\floor*{\frac{\texttt{x}}{4^{-\texttt{n}}}}+1\right)\cdot 4^{-\texttt{n}}
+\end{align*}
+
+\textbf{IV.17}
+J'ai prouvé la double inégalité
+$
+\ceil*{\sqrt{\texttt{n}+1}} -1
+\leq \floor*{\sqrt{\texttt{n}}}
+\leq \floor*{\sqrt{\texttt{n}-1}}+1
+$
+en séparant les deux inégalités.
+
+Celle de gauche se montre assez facilement :
+
+\begin{align*}
+   &\texttt{n} \leq \texttt{n} +2\cdot\sqrt{\texttt{n}-1}
+      =\left(\sqrt{\texttt{n}-1}+1\right)^2\\
+\Rightarrow
+    &\sqrt{ \texttt{n} } \leq \sqrt{\texttt{n}-1}+1 \\
+ \Rightarrow
+        &\floor*{\sqrt{ \texttt{n} }} \leq \sqrt{\texttt{n}-1}+1 \\
+\end{align*}
+
+Pour celle de droite,
+
+\begin{listing}
+\begin{code}[ocaml]
+   let lemma sqrt_floor (n: int) : unit
+     requires { n >= 1 }
+     ensures { ceil (sqrt (from_int (n+1))) - 1
+               <= floor (sqrt (from_int n))
+               <= floor (sqrt (from_int(n-1))) + 1 }
+\end{code}
+\caption{contrat du lemme \texttt{sqrt\_floor}}
+\end{listing}
 
 
 
