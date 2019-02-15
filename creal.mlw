@@ -563,6 +563,32 @@ let lemma inv_str_decr (x y: real) : unit
   assert { inv x <> inv y };
   ()
 
+let lemma tauto (x y z: real) : unit
+  requires { x <=. y}
+  requires { z >=. 0.}
+  ensures { x*. z <=. y *. z}
+=
+  ()
+
+let lemma help_assert (ghost x: real) (p: int) (n: int) : unit
+  requires { framing x p (n+1) }
+  requires { 0 <= n }
+  requires { 1. <=. x }
+  ensures { p > 0}
+=
+  assert { 1. >=. pow 4.0 (from_int (-(n+1)))
+    by  from_int (-(n+1)) <=. 0.
+    so 1.
+      = pow 4.0 0.
+      >=. pow 4.0 (from_int (-(n+1))) };
+  assert { from_int (p+1) >=. 0.};
+  assert { from_int (p+1) 
+    >=. from_int (p+1) *. (pow 4.0 (from_int (-(n+1))))
+    >. x
+    >=. 1. };
+  assert {p > 0
+    by p + 1 > 1};
+  ()
 
 let inv_simple_simple (ghost x: real) (p: int) (n: int)
   requires { framing x p (n+1) }
@@ -581,19 +607,7 @@ let inv_simple_simple (ghost x: real) (p: int) (n: int)
     so power 4 (2*n+1) 
       = power 2 (2*(n+k)) };
       
-  assert { p > 0
-    by n >= 0
-    so 1. >=. pow 4.0 (from_int (-(n+1)))
-      = _B(-(n+1))
-      >. 0.
-    so ((from_int p) +. 1.)
-      >=. 0.
-    so ((from_int p) +. 1.)
-      = ((from_int p) +. 1.) *. 1.
-      >=. ((from_int p) +. 1.) *. _B (-(n+1))
-      >. x >=. 1.
-    so (from_int p) +. 1. >. 1.
-    so from_int p >. 0. }; 
+  let ghost _ = help_assert x p n in
   let d, r = ediv_mod puiss p in
   if 2*r <= p then
   begin
@@ -612,11 +626,110 @@ let inv_simple_simple (ghost x: real) (p: int) (n: int)
   else
     d + 1
 
+let inv_simple (ghost x: real) (p m n: int)
+  requires{ 0 <= m}
+  requires{ 0 <= n}
+  requires{ _B (-m) <. x}
+  requires { framing x p (n+1+2*m) }
+  ensures { framing (inv x) result n }
+=
+  assert { framing (x *. (_B m) ) p ((n+m)+1)
+    by _B (-(n+1+2*m))
+      = _B (-(n+1+m)) *. _B(-m)
+    so x
+      >. (from_int p -.1.) *. _B (-(n+1+2*m))
+      = (from_int p -.1.) *. _B (-(n+1+m)) *. _B(-m)
+    so x *. _B(m) 
+      >. (from_int p -.1.) *. _B (-(n+1+m)) *. _B(-m) *. _B(m) 
+      = (from_int p -.1.) *. _B (-(n+1+m)) 
+    so x
+      <. (from_int p +.1.) *. _B (-(n+1+2*m))
+      = (from_int p +.1.) *. _B (-(n+1+m)) *. _B(-m)
+    so x *. _B(m) 
+      <. (from_int p +.1.) *. _B (-(n+1+m)) *. _B(-m) *. _B(m) 
+      = (from_int p +.1.) *. _B (-(n+1+m)) };
+  assert { 1. <=. x *. (_B m) }; 
+  let res = inv_simple_simple (x *. (_B m) ) p (n+m) in
+  begin
+  assert { framing (inv x) res n
+    by framing (inv (x *. _B(m))) res (n+m)
+    so (inv x) *. _B(-m) 
+      = (inv x) *. (inv (_B m))
+      = inv (x *. _B(m))
+      >. (from_int res -. 1.)*. _B(-(n+m))
+      = (from_int res -. 1.)*. _B(-n) *. _B(-m)
+    so (inv x) >. (from_int res -. 1.)*. _B(-n)
+    so (inv x) *. _B(-m) 
+      = (inv x) *. (inv (_B m))
+      = inv (x *. _B(m))
+      <. (from_int res +. 1.)*. _B(-(n+m))
+      = (from_int res +. 1.)*. _B(-n) *. _B(-m)
+    so (inv x) <. (from_int res +. 1.)*. _B(-n) };
+  res
+  end
 
+type term2 = 
+  | Cst2 int
+  | Add2 term2 term2
+  | Neg2 term2
+  | Sub2 term2 term2
+  | Sqrt2 term2
+  | Inv2 term2
 
+let rec compute2 (t: term) (n: int) : int
+  requires { wf_term t }
+  requires { 0 <= n }
+  ensures { framing (interp t) result n }
+=
+  match t with
+  | Cst i -> 
+    compute_cst n i
+  | Add t1 t2 -> 
+    let x1 = compute t1 (n+1) in
+    let x2 = compute t2 (n+1) in
+      compute_add n (interp t1) x1 (interp t2) x2
+  | Neg t' -> 
+    let x = compute t' n in
+      compute_neg n (interp t') x
+  | Sub t1 t2 ->
+    let x1 = compute t1 (n+1) in
+    let x2 = compute t2 (n+1) in
+      compute_sub n (interp t1) x1 (interp t2) x2
+  | Sqrt t' -> 
+    let x = compute t' (2*n) in
+      compute_sqrt n (interp t') x
+  end
 
-
-
-
-
+with msd (t: term) (n: int) (c: int) : (int, bool)
+  requires { 0 <= n }
+  requires { wf_term t }
+  requires { interp t <> 0. }
+  requires { framing (interp t) c n }
+(*
+  variant { (abs c) }
+*)
+  ensures { let m, sgn = result in
+    0 <= m /\
+    if sgn then  _B(-m) <. interp t else interp t <. -. _B(-m) }
+=
+  if c = 0 || c = -1 || c = 1 then begin
+    let c = compute2 t (n+1) in
+    msd t (n+1) c
+  end
+  else begin
+    if 1 < c then
+      n, true
+    else
+      let ghost t0 = interp t in
+      let _ = assert { t0 <. -. _B(-n) 
+        by c < -1
+        so c + 1 <= -1
+        so from_int c +. 1. <=. -. 1.
+        so t0
+          <. (from_int c +. 1.) *. _B(-n)
+          <=. (-. 1.) *. _B(-n)
+          = -. _B(-n) } in
+      n, false
+  end
+  
   
