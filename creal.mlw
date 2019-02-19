@@ -676,41 +676,82 @@ type term2 =
   | Sqrt2 term2
   | Inv2 term2
 
-let rec compute2 (t: term) (n: int) : int
-  requires { wf_term t }
-  requires { 0 <= n }
-  ensures { framing (interp t) result n }
-=
+
+let rec ghost function interp2 (t: term2) : real =
   match t with
-  | Cst i -> 
-    compute_cst n i
-  | Add t1 t2 -> 
-    let x1 = compute t1 (n+1) in
-    let x2 = compute t2 (n+1) in
-      compute_add n (interp t1) x1 (interp t2) x2
-  | Neg t' -> 
-    let x = compute t' n in
-      compute_neg n (interp t') x
-  | Sub t1 t2 ->
-    let x1 = compute t1 (n+1) in
-    let x2 = compute t2 (n+1) in
-      compute_sub n (interp t1) x1 (interp t2) x2
-  | Sqrt t' -> 
-    let x = compute t' (2*n) in
-      compute_sqrt n (interp t') x
+  | Cst2 i -> from_int i
+  | Add2 t t' -> (interp2 t) +. (interp2 t')
+  | Neg2 t -> 0. -. (interp2 t)
+  | Sub2 t t' -> (interp2 t) -. (interp2 t')
+  | Sqrt2 t -> sqrt (interp2 t)
+  | Inv2 t -> Real.inv (interp2 t)
   end
 
-with msd (t: term) (n: int) (c: int) : (int, bool)
+predicate wf_term2 (t: term2) =
+  match t with
+  | Cst2 _ -> True
+  | Add2 t t' -> (wf_term2 t) /\ (wf_term2 t')
+  | Neg2 t -> (wf_term2 t)
+  | Sub2 t t' -> (wf_term2 t) /\ (wf_term2 t')
+  | Sqrt2 t -> (wf_term2 t) /\ (interp2 t >=. 0.)
+  | Inv2 t -> (wf_term2 t) /\ (interp2 t <> 0.)
+  end
+
+
+let lemma frame_opp (x: real) (p n: int) : unit
+  requires { framing x p n}
+  ensures { framing (-. x) (- p) n }
+=
+  ()
+
+let rec compute2 (t: term2) (n: int) : int
+  requires { wf_term2 t }
   requires { 0 <= n }
-  requires { wf_term t }
-  requires { interp t <> 0. }
-  requires { framing (interp t) c n }
-(*
-  variant { (abs c) }
-*)
+  variant { t }
+  ensures { framing (interp2 t) result n }
+=
+  match t with
+  | Cst2 i -> 
+    compute_cst n i
+  | Add2 t1 t2 -> 
+    let x1 = compute2 t1 (n+1) in
+    let x2 = compute2 t2 (n+1) in
+      compute_add n (interp2 t1) x1 (interp2 t2) x2
+  | Neg2 t' -> 
+    let x = compute2 t' n in
+      compute_neg n (interp2 t') x
+  | Sub2 t1 t2 ->
+    let x1 = compute2 t1 (n+1) in
+    let x2 = compute2 t2 (n+1) in
+      compute_sub n (interp2 t1) x1 (interp2 t2) x2
+  | Sqrt2 t' -> 
+    let x = compute2 t' (2*n) in
+      compute_sqrt n (interp2 t') x
+  | Inv2 t ->
+    let m, sgn = msd t 0 (compute2 t 0) in
+    let p = compute2 t (n+1+2*m) in
+    let _ = assert { framing (interp2 t) p (n+1+2*m) } in
+    let x = interp2 t in
+    if sgn then
+      inv_simple x p m n
+    else
+      let res = (inv_simple (-. x) (-p) m n) in begin
+      assert { framing (Real.inv (x)) (- res) n
+        by framing (Real.inv (-. x)) (res) n
+        so framing (-. (Real.inv x)) res n };
+      - res
+      end
+    end
+
+with msd (t: term2) (n: int) (c: int) : (int, bool)
+  requires { 0 <= n }
+  requires { wf_term2 t }
+  requires { interp2 t <> 0. }
+  requires { framing (interp2 t) c n }
+  variant { (t, -n) }
   ensures { let m, sgn = result in
     0 <= m /\
-    if sgn then  _B(-m) <. interp t else interp t <. -. _B(-m) }
+    if sgn then  _B(-m) <. interp2 t else interp2 t <. -. _B(-m) }
 =
   if c = 0 || c = -1 || c = 1 then begin
     let c = compute2 t (n+1) in
@@ -718,9 +759,10 @@ with msd (t: term) (n: int) (c: int) : (int, bool)
   end
   else begin
     if 1 < c then
+      let _ = assert { _B(-n) <. interp2 t } in
       n, true
     else
-      let ghost t0 = interp t in
+      let ghost t0 = interp2 t in
       let _ = assert { t0 <. -. _B(-n) 
         by c < -1
         so c + 1 <= -1
