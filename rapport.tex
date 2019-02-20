@@ -178,6 +178,11 @@ autogobble]{#1}%
 \end{minted}
 \restoregeometry
 }
+% \usepackage{tcolorbox}
+% \usepackage{etoolbox}
+% \BeforeBeginEnvironment{code}{\begin{tcolorbox}}%
+% \AfterEndEnvironment{code}{\end{tcolorbox}}%
+
 
 \usepackage[nottoc, notlof, notlot]{tocbibind}
 
@@ -492,7 +497,7 @@ résultat
 
 \subsection{Conversion}
 
-Bien que n'étant pas une fonction à proprement parler, la preuve de la fonction
+Bien que n'étant pas une question à proprement parler, la preuve de la fonction
 \texttt{compute\_cst} a nécessité des \texttt{asserts} pour guider les solveurs
 dans le cas \texttt{n < 0}. Les uatres cas (\texttt{n = 0} et \texttt{n > 0})
 ont été prouvés sans problèmes par les solveurs.
@@ -518,13 +523,18 @@ Et pour celle de droite :
    & = \left(\floor*{\frac{\texttt{x}}{4^{-\texttt{n}}}}+1\right)\cdot 4^{-\texttt{n}}
 \end{align*}
 
+\subsection{Square Root}
+
+
 \textbf{IV.17}
 J'ai prouvé la double inégalité
-$
+\begin{equation}
 \ceil*{\sqrt{\texttt{n}+1}} -1
 \leq \floor*{\sqrt{\texttt{n}}}
 \leq \floor*{\sqrt{\texttt{n}-1}}+1
-$
+\label{eq:sqrt}
+\end{equation}
+
 en séparant les deux inégalités.
 
 Celle de gauche se montre assez facilement :
@@ -540,6 +550,26 @@ Celle de gauche se montre assez facilement :
 
 Pour celle de droite,
 
+\begin{align*}
+   \left(\floor*{\sqrt{n}}+1 \right)^2
+   &=\left(\floor*{\sqrt{n}}\right)^2 + 2\floor*{\sqrt{n}} +1
+\\   &\geq \left(\sqrt{n} -1 \right)^2 + 2\floor*{\sqrt{n}} +1
+\\   &= n + 2 -2
+      \underbrace{\left(\sqrt{ n }- \floor*{\sqrt{ n }}\right)}_{< 1}
+\\   &> n + 2 -2
+\\   &= n
+\end{align*}
+
+Donc :
+\begin{align*}
+   &\left(\floor*{\sqrt{n}}+1 \right)^2 > n
+\\   \Rightarrow
+   &\left(\floor*{\sqrt{n}}+1 \right)^2 \geq n+1
+\end{align*}
+Car les termes de chaque coté sont des entiers.
+
+En appliquant la fonction racine carrée de chaque côté de l'inégalité,
+on obtient le résultat attendu.
 \begin{listing}
 \begin{code}[ocaml]
    let lemma sqrt_floor (n: int) : unit
@@ -548,33 +578,307 @@ Pour celle de droite,
                <= floor (sqrt (from_int n))
                <= floor (sqrt (from_int(n-1))) + 1 }
 \end{code}
-\caption{contrat du lemme \texttt{sqrt\_floor}}
+\caption{Contrat du lemme \texttt{sqrt\_floor}}
+\end{listing}
+
+\textbf{IV.18}
+La preuve de la fonction \texttt{compute\_sqrt}, repose directement sur le lemme
+précédent.
+
+Pour le cas \texttt{xp}$\leq 0$, la preuve est trouvée immédiatement par le
+solveur.
+
+Le second cas est prouvée de la manière suivante :
+
+\begin{align*}
+     &\left( \floor*{\sqrt{ \texttt{xp} }}-1 \right)\B(-n)
+\\ &\leq \left( \floor*{\sqrt{ \texttt{xp}-1 }} \right)\B(-n)
+  & \text{En utilisant \ref{eq:sqrt}}
+\\ &\leq \left( \sqrt{\texttt{xp}-1} \right)\B(-n)
+  & \text{Car }\floor{\bullet} \leq \bullet
+\\ &=  \sqrt{\left(\texttt{xp}-1 \right)\B(-2n)}
+\\ &< \sqrt{ x }
+   & \text{Par hypothèse }
+\\ &< \sqrt{\left(\texttt{xp}+1 \right)\B(-2n)}
+\\ &\leq \left( \sqrt{\texttt{xp}+1} \right)\B(-n)
+\\ &\leq \left( \ceil*{\sqrt{ \texttt{xp}+1 }} \right)\B(-n)
+   & \text{Car }\ceil*{\bullet} \geq \bullet
+\\ &\leq \left( \floor*{\sqrt{ \texttt{xp} }}+1 \right)\B(-n)
+& \text{En utilisant \ref{eq:sqrt}}
+\end{align*}
+
+\begin{listing}
+\begin{code}[ocaml]
+   let compute_sqrt (n: int) (ghost x : real) (xp : int)
+     requires { 0. <=. x }
+     requires { framing x xp (2*n) }
+     ensures { framing (sqrt x) result n }
+\end{code}
+\caption{Contrat de la fonction \texttt{compute\_sqrt}}
 \end{listing}
 
 
+\subsection{Compute}
+
+\textbf{IV.19-20}
+La fonction \texttt{interp} et le prédicat \texttt{wf\_term}
+s'écrivent immédiatement par induction :
+
+
+\begin{listing}
+\begin{code}[ocaml]
+let rec ghost function interp (t: term) : real =
+  match t with
+  | Cst i -> from_int i
+  | Add t t' -> (interp t) +. (interp t')
+  | Neg t -> 0. -. (interp t)
+  | Sub t t' -> (interp t) -. (interp t')
+  | Sqrt t -> sqrt (interp t)
+  end
+\end{code}
+\caption{Code de la fonction \texttt{interp}}
+\end{listing}
+
+\begin{listing}
+\begin{code}[ocaml]
+predicate wf_term (t: term) =
+  match t with
+  | Cst _ -> True
+  | Add t t' -> (wf_term t) /\ (wf_term t')
+  | Neg t -> (wf_term t)
+  | Sub t t' -> (wf_term t) /\ (wf_term t')
+  | Sqrt t -> (wf_term t) /\ (interp t >=. 0.)
+  end
+\end{code}
+\caption{Code du prédicat \texttt{wf\_term}}
+\end{listing}
+
+\textbf{IV.21}
+De même la fonction \texttt{compute} s'écrit facilement de manière récursive.
+Chaque appel récursif se fait sur un sous-terme strictement plus petit
+en utilisant une nouvelle valeur pour la précision pour avoir une bonne
+précision pour le résultat.
+
+La preuve ne pose pas de problème une fois qu'on a appliqué la tactique
+\texttt{destruct\_alg t}
+
+
+\begin{listing}
+\begin{code}[ocaml]
+   let rec compute (t: term) (n: int) : int
+     requires { wf_term t }
+     variant { t }
+     ensures { framing (interp t) result n }
+\end{code}
+\caption{Contrat de la fonction \texttt{compute}}
+\end{listing}
+
+\section{Division}
+
+\textbf{V.22}
+J'ai prouvé les deux lemmes séparément. Toutefois ils ont le même schéma de
+preuve.
+On part de l'égalité $a = (\texttt{ED.div}\ a\ b)*b+(\texttt{ED.mod}\ a\ b)$.
+Puis on la modifie pour obtenir le la division selon $b\pm 1$, et on conclue en
+appelant le lemme \texttt{euclid\_uniq}, car le «reste» est dans le bon
+intervalle
+
+Pour le premier lemme :
+
+\begin{align*}
+   a = d\cdot b+r = d(b+1) +r-d
+\end{align*}
+
+\begin{itemize}
+   \item Si $r < d$ :
+\begin{align*}
+a   &= (d-1)(b+1) +
+   \underbrace{r-d+1+b+1}_{b+1 > \bullet\geq 0}
+\end{align*}
+   \item Sinon $r \geq d$ d'où
+\begin{align*}
+a
+   &= d(b+1) +
+   \underbrace{r-d}_{\geq 0} \\
+\end{align*}
+\end{itemize}
 
 
 
+\begin{listing}
+\begin{code}[ocaml]
+let lemma div_a_b_plus_1 (a: int) (b: int) : unit
+  requires { a > 0 }
+  requires { b > 0 }
+  requires { ED.div a  b < b }
+  ensures { ED.div a (b+1) =
+    if (ED.mod a b) < (ED.div a b)
+      then (ED.div a b) -1
+      else (ED.div a b) }
+\end{code}
+\caption{Contrat du premier lemme}
+\end{listing}
+
+Pour le second lemme :
+
+\begin{align*}
+a = d\cdot b +r = d(b-1) +r +d
+\end{align*}
+
+\begin{itemize}
+   \item Si $b-1-d \leq r$,
+   \begin{align*}
+      a = (d+1)(b-1) + r + d - b + 1
+   \end{align*}
+   \item Sinon,
+   \begin{align*}
+      a = d(b-1) + r + d
+   \end{align*}
+\end{itemize}
+
+\begin{listing}
+\begin{code}[ocaml]
+   let lemma div_a_b_minus_1 (a: int) (b: int) : unit
+     requires { a > 0 }
+     requires { b > 1 }
+     requires { ED.div a b < b - 1 }
+     ensures { ED.div a (b-1) =
+       if ED.mod a b >= b - 1 - (ED.div a b)
+         then (ED.div a b) + 1
+         else  ED.div a b
+\end{code}
+\caption{Contrat du second lemme}
+\end{listing}
+
+\textbf{V.23}
+Pour la fonction \texttt{inv\_simple\_simple}, j'y arrive pas :( !
+
+\textbf{V.24}
+Pour la fonction \texttt{inv\_simple}, la pruve se fait en deux temps :
+celle de la précondition pour l'appel à \texttt{inv\_simple\_simple}, puis celle
+de la post-condition de la fonction.
+
+Pour la précondition :
+
+$$
+(\texttt{p}-1)\B(-(n+1+2m)) < x < (\texttt{p}+1)\B(-(n+1+2m))
+$$
+
+En remarquant que $\B(-(n+1+2m)) = \B(-m)\B(-(n+1+m)) =
+\frac{ \B(-(n+1+m)) }{ \B(m) }$, on a :
+
+$$
+(\texttt{p}-1)\B(-(n+1+m)) < x\B(m) < (\texttt{p}+1)\B(-(n+1+m))
+$$
+
+Pour la post-condition, on fait la preuve inverse.
+
+\begin{listing}
+\begin{code}[ocaml]
+let inv_simple (ghost x: real) (p m n: int)
+  requires{ 0 <= m}
+  requires{ 0 <= n}
+  requires{ _B (-m) <. x}
+  requires { framing x p (n+1+2*m) }
+  ensures { framing (inv x) result n }
+\end{code}
+\caption{Contrat de la fonction \texttt{inv\_simple}}
+\end{listing}
+
+\textbf{V.25}
+Pour cette question, j'ai réécris le type \texttt{term}, la fonction
+\texttt{interp} et le prédicat \texttt{wf\_term}, pour prendre en compte le cas
+de la fonction inverse.
 
 
+\begin{listing}
+\begin{code}[ocaml]
+type term2 =
+  | Cst2 int
+  | Add2 term2 term2
+  | Neg2 term2
+  | Sub2 term2 term2
+  | Sqrt2 term2
+  | Inv2 term2
 
 
+let rec ghost function interp2 (t: term2) : real =
+  match t with
+  | Cst2 i -> from_int i
+  | Add2 t t' -> (interp2 t) +. (interp2 t')
+  | Neg2 t -> 0. -. (interp2 t)
+  | Sub2 t t' -> (interp2 t) -. (interp2 t')
+  | Sqrt2 t -> sqrt (interp2 t)
+  | Inv2 t -> Real.inv (interp2 t)
+  end
+
+predicate wf_term2 (t: term2) =
+  match t with
+  | Cst2 _ -> True
+  | Add2 t t' -> (wf_term2 t) /\ (wf_term2 t')
+  | Neg2 t -> (wf_term2 t)
+  | Sub2 t t' -> (wf_term2 t) /\ (wf_term2 t')
+  | Sqrt2 t -> (wf_term2 t) /\ (interp2 t >=. 0.)
+  | Inv2 t -> (wf_term2 t) /\ (interp2 t <> 0.)
+  end
+\end{code}
+\caption{Code pour l'extension du type \texttt{term}}
+\end{listing}
+
+\textbf{V.26}
+De même que pour la première fonction \texttt{compute}, celle-ci se prouve
+facilement en utilisant le tactique \texttt{destruct\_alg t}.
+Le seul cas un tant soit peu complexe est dans le cas de l'inversion d'un nombre
+négatif. J'ai donc rajouté un lemme \texttt{frame\_opp}.
+
+Pour la fonction \texttt{msd}, le seul cas non trivial est le cas \texttt{c}$<1$.
+Il seul traite en utilisant l'hypothèse d'encadrement.
+On a, $c < -1$ or comme $c\in\Z$, $c -1 \leq -1$ d'où :
+$\texttt{interp}(\texttt{t}) < (c+1)\B(-n) \leq \B(-n)$.
 
 
+\begin{listing}
+\begin{code}[ocaml]
+let lemma frame_opp (x: real) (p n: int) : unit
+  requires { framing x p n}
+  ensures { framing (-. x) (- p) n }
+\end{code}
+\caption{Contrat du lemme \texttt{frame\_opp}}
+\end{listing}
 
+\begin{listing}
+\begin{code}[ocaml]
+let rec compute2 (t: term2) (n: int) : int
+  requires { wf_term2 t }
+  requires { 0 <= n }
+  variant { t }
+  ensures { framing (interp2 t) result n }
+\end{code}
+\caption{Contrat de la fonction \texttt{compute2}}
+\end{listing}
 
+\begin{listing}
+\begin{code}[ocaml]
+with msd (t: term2) (n: int) (c: int) : (int, bool)
+  requires { 0 <= n }
+  requires { wf_term2 t }
+  requires { interp2 t <> 0. }
+  requires { framing (interp2 t) c n }
+  variant { (t, -n) }
+  ensures { let m, sgn = result in
+    0 <= m /\
+    if sgn then  _B(-m) <. interp2 t
+           else interp2 t <. -. _B(-m) }
+\end{code}
+\caption{Contrat de la fonction \texttt{msd}}
+\end{listing}
 
+\textbf{V.27}
+Maman, j'y arrive pas !
 
+\section*{Conclusion}
 
-
-
-
-
-
-
-
-
-
+Le projet est clairement cool ! 
 
 %\newpage
 %\tableofcontents
