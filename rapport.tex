@@ -217,7 +217,7 @@ Par exemple dans les cas où il fait \textit{déplacer} les \texttt{from\_int}.
 
 
 \tableofcontents
-\listoflistings
+%\listoflistings
 
 \section{Axioms}
 
@@ -767,7 +767,9 @@ a = d\cdot b +r = d(b-1) +r +d
 \end{listing}
 
 \textbf{V.23}
-Pour la fonction \texttt{inv\_simple\_simple}, j'y arrive pas :( !
+Pour la fonction \texttt{inv\_simple\_simple}, j'ai réussi à prouver la
+précondition de l'appel à la fonction \texttt{ediv\_mod}, mais je ne suis pas
+parvenu à prouver, la post-condition.
 
 \textbf{V.24}
 Pour la fonction \texttt{inv\_simple}, la pruve se fait en deux temps :
@@ -890,11 +892,22 @@ with msd (t: term2) (n: int) (c: int) : (int, bool)
 \end{listing}
 
 \textbf{V.27}
-Maman, j'y arrive pas !
+Je ne suis pas non plus parvenu à prouver la terminaison de la fonction \texttt{compute}.
+En utilisant l'aide donnée dans le sujet, j'ai été capable de prouver le résultat de la fonction \texttt{exists\_m\_term} pour l'existence d'un $m$ suffisamment grand.
+Toutefois, je n'ai pas pu le mettre à profit pour la terminaison.
 
-\section*{Conclusion}
-
-
+\begin{listing}
+\begin{code}[ocaml]
+let ghost exists_m_term (t: term2) : int
+  requires { interp2 t <> 0. }
+  ensures {
+    let m = result in
+    m > 0 /\
+    if interp2 t >. 0. then _B(-m) <. interp2 t
+               else interp2 t <. -. _B(-m) }
+\end{code}
+\caption{Contrat de la fonction \texttt{msd}}
+\end{listing}
 
 %\newpage
 %\tableofcontents

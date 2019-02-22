@@ -49,7 +49,7 @@
   <proof prover="0" memlimit="100"><result status="valid" time="0.00" steps="13"/></proof>
   </goal>
   <goal name="VC ediv_mod.2" expl="loop variant decrease" proved="true">
-  <proof prover="0" memlimit="100"><result status="valid" time="0.02" steps="48"/></proof>
+  <proof prover="0" memlimit="100"><result status="valid" time="0.02" steps="22"/></proof>
   </goal>
   <goal name="VC ediv_mod.3" expl="loop invariant preservation" proved="true">
   <proof prover="0" memlimit="100"><result status="valid" time="0.01" steps="22"/></proof>
@@ -951,10 +951,155 @@
  <goal name="VC frame_opp" expl="VC for frame_opp" proved="true">
  <proof prover="0" memlimit="1000"><result status="valid" time="0.03" steps="96"/></proof>
  </goal>
+ <goal name="VC pow2_log2" expl="VC for pow2_log2" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC pow2_log2.0" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC pow2_log2.0.0" expl="VC for pow2_log2" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+   <goal name="VC pow2_log2.0.1" expl="VC for pow2_log2" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+   <goal name="VC pow2_log2.0.2" expl="VC for pow2_log2" proved="true">
+   <proof prover="5" timelimit="30"><result status="valid" time="2.55"/></proof>
+   </goal>
+   <goal name="VC pow2_log2.0.3" expl="VC for pow2_log2" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+   <goal name="VC pow2_log2.0.4" expl="VC for pow2_log2" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="10"/></proof>
+   </goal>
+   <goal name="VC pow2_log2.0.5" expl="VC for pow2_log2" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC pow2_log2.1" expl="postcondition" proved="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="21"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC diff_log" expl="VC for diff_log" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC diff_log.0" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC diff_log.0.0" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="VC diff_log.0.1" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="VC diff_log.0.2" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="VC diff_log.0.3" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="49"/></proof>
+   </goal>
+   <goal name="VC diff_log.0.4" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+   </goal>
+   <goal name="VC diff_log.0.5" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC diff_log.1" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC diff_log.1.0" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+   </goal>
+   <goal name="VC diff_log.1.1" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
+   </goal>
+   <goal name="VC diff_log.1.2" expl="VC for diff_log" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="62"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC diff_log.2" expl="postcondition" proved="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC exists_m" expl="VC for exists_m" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC exists_m.0" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC exists_m.0.0" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+   </goal>
+   <goal name="VC exists_m.0.1" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.12" steps="403"/></proof>
+   </goal>
+   <goal name="VC exists_m.0.2" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+   <goal name="VC exists_m.0.3" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC exists_m.1" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC exists_m.1.0" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
+   </goal>
+   <goal name="VC exists_m.1.1" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.03" steps="101"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC exists_m.2" expl="precondition" proved="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="14"/></proof>
+  </goal>
+  <goal name="VC exists_m.3" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="VC exists_m.3.0" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+   <goal name="VC exists_m.3.1" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.41" steps="297"/></proof>
+   </goal>
+   <goal name="VC exists_m.3.2" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.07" steps="67"/></proof>
+   </goal>
+   <goal name="VC exists_m.3.3" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+   <goal name="VC exists_m.3.4" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+   <goal name="VC exists_m.3.5" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.03" steps="16"/></proof>
+   </goal>
+   <goal name="VC exists_m.3.6" expl="VC for exists_m" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="VC exists_m.4" expl="postcondition" proved="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.20" steps="410"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="VC exists_m_term" expl="VC for exists_m_term" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="VC exists_m_term.0" expl="precondition" proved="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="12"/></proof>
+  </goal>
+  <goal name="VC exists_m_term.1" expl="precondition" proved="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="12"/></proof>
+  </goal>
+  <goal name="VC exists_m_term.2" expl="postcondition" proved="true">
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="10"/></proof>
+  </goal>
+ </transf>
+ </goal>
  <goal name="VC compute2" expl="VC for compute2">
  <transf name="split_vc" >
   <goal name="VC compute2.0" expl="variant decrease" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="362"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.07" steps="362"/></proof>
   </goal>
   <goal name="VC compute2.1" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="16"/></proof>
@@ -963,7 +1108,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="VC compute2.3" expl="variant decrease" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.16" steps="568"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.16" steps="569"/></proof>
   </goal>
   <goal name="VC compute2.4" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
@@ -978,7 +1123,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="18"/></proof>
   </goal>
   <goal name="VC compute2.8" expl="variant decrease" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.06" steps="290"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="290"/></proof>
   </goal>
   <goal name="VC compute2.9" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
@@ -990,7 +1135,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="VC compute2.12" expl="variant decrease" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="361"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.06" steps="361"/></proof>
   </goal>
   <goal name="VC compute2.13" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
@@ -999,7 +1144,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="VC compute2.15" expl="variant decrease" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.14" steps="569"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.13" steps="565"/></proof>
   </goal>
   <goal name="VC compute2.16" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
@@ -1014,7 +1159,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="18"/></proof>
   </goal>
   <goal name="VC compute2.20" expl="variant decrease" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.05" steps="317"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="317"/></proof>
   </goal>
   <goal name="VC compute2.21" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
@@ -1038,7 +1183,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="16"/></proof>
   </goal>
   <goal name="VC compute2.28" expl="variant decrease">
-  <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
+  <proof prover="0" memlimit="1000"><undone/></proof>
   <proof prover="5" timelimit="30" obsolete="true"><result status="outofmemory" time="12.36"/></proof>
   </goal>
   <goal name="VC compute2.29" expl="precondition" proved="true">
@@ -1054,7 +1199,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="21"/></proof>
   </goal>
   <goal name="VC compute2.33" expl="variant decrease" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="0.29" steps="611"/></proof>
+  <proof prover="0" memlimit="1000"><result status="valid" time="0.28" steps="611"/></proof>
   </goal>
   <goal name="VC compute2.34" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="22"/></proof>
@@ -1117,10 +1262,10 @@
    <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
    </goal>
    <goal name="VC compute2.46.4" expl="postcondition" proved="true">
-   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="62"/></proof>
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="62"/></proof>
    </goal>
    <goal name="VC compute2.46.5" expl="postcondition" proved="true">
-   <proof prover="0" memlimit="1000"><result status="valid" time="0.04" steps="76"/></proof>
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="76"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1130,7 +1275,6 @@
  <transf name="split_vc" >
   <goal name="VC msd.0" expl="variant decrease" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
-  <proof prover="5" timelimit="30" obsolete="true"><result status="outofmemory" time="7.90"/></proof>
   </goal>
   <goal name="VC msd.1" expl="precondition" proved="true">
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
@@ -1139,7 +1283,7 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="16"/></proof>
   </goal>
   <goal name="VC msd.3" expl="variant decrease">
-  <proof prover="0" memlimit="1000" obsolete="true"><result status="timeout" time="30.00"/></proof>
+  <proof prover="0" memlimit="1000"><undone/></proof>
   <proof prover="5" timelimit="30" obsolete="true"><result status="timeout" time="30.00"/></proof>
   </goal>
   <goal name="VC msd.4" expl="precondition" proved="true">
@@ -1155,7 +1299,17 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="19"/></proof>
   </goal>
   <goal name="VC msd.8" expl="assertion" proved="true">
-  <proof prover="0" memlimit="1000"><result status="valid" time="14.67" steps="1968"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="VC msd.8.0" expl="VC for msd" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="28"/></proof>
+   </goal>
+   <goal name="VC msd.8.1" expl="VC for msd" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.18" steps="396"/></proof>
+   </goal>
+   <goal name="VC msd.8.2" expl="VC for msd" proved="true">
+   <proof prover="0" memlimit="1000"><result status="valid" time="0.01" steps="30"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="VC msd.9" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1186,9 +1340,6 @@
   <proof prover="0" memlimit="1000"><result status="valid" time="0.02" steps="28"/></proof>
   </goal>
  </transf>
- </goal>
- <goal name="VC tauto">
- <proof prover="5" timelimit="40" memlimit="2000"><result status="valid" time="0.02"/></proof>
  </goal>
 </theory>
 </file>

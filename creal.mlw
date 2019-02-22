@@ -77,7 +77,7 @@ ensures { let d,r = result in
     while (!r >= y) do
       invariant { x = !d * y + !r }
       invariant { !r >= 0}
-      variant { (abs !r) - y }
+      variant { (!r) - y }
       r := !r - y;
       d := !d + 1
     done;
@@ -613,16 +613,6 @@ let lemma inv_str_decr (x y: real) : unit
   assert { inv x <> inv y };
   ()
 
-(*
-let lemma tauto (x y z: real) : unit
-  requires { x <=. y}
-  requires { z >=. 0.}
-  ensures { x*. z <=. y *. z}
-=
-  ()
-*)
-
-
 let lemma help_assert (ghost x: real) (p: int) (n: int) : unit
   requires { framing x p (n+1) }
   requires { 0 <= n }
@@ -770,10 +760,86 @@ let lemma frame_opp (x: real) (p n: int) : unit
 =
   ()
 
+let lemma pow2_log2 (x: real) : unit
+  requires { x >. 0. }
+  ensures { pow 2. (log2 x) = x }
+=
+  assert { pow 2. (log2 x)
+    = exp ((log2 x) *. (log 2.))
+    = exp (((log x) /. (log 2.)) *. (log 2.))
+    = exp ((log x) *. ((log 2.) /. (log 2.)))
+    = exp ((log x) *. 1.)
+    = exp (log x)
+    = x };
+  ()
+
+let lemma diff_log (x y: real) : unit
+  requires { x >. 0. }
+  requires { y >. 0. }
+  ensures { (log x) -. (log y) = log ( x /. y) }
+=
+  assert { -. (log y) = log (1. /. y)
+    by (log y) -. (log y) 
+      = 0.
+      = log 1.
+      = log (y /. y)
+      = log (y *. (1. /. y))
+      = (log y) +. (log (1. /. y)) };
+  assert { (log x) -. (log y)
+    = (log x) +. (log (1. /. y))
+    = log (x *. (1. /. y))
+    = log (x /. y)};
+  () 
+
+let ghost exists_m (x: real) : int 
+  requires { x >. 0. }
+  ensures { let m = result in
+    m > 0 /\
+    _B(-m) <. x }
+=
+  if x >=. 1. then begin
+    let ghost m = 1 in
+      assert { _B(-m) 
+        = pow 4. (-1.)
+        = 0.25
+        <. 1. 
+        <=. x };
+    m
+  end
+  else begin
+    assert { x *. x <. x
+      by x <. 1. };
+    let ghost m = - floor (log2(x)) in
+    let ghost _ = pow2_log2 x in
+    assert { _B(-m)
+      = pow 4. (from_int (-m))
+      <=. pow 4. (log2(x))
+      <=. pow (pow 2. 2.) (log2 x)
+      = pow 2. (2. *. (log2 x))
+      = pow (pow 2. (log2 x)) 2.
+      = pow x 2.
+      <. x };
+    m
+  end
+
+let ghost exists_m_term (t: term2) : int
+  requires { interp2 t <> 0. }
+  ensures { 
+    let m = result in
+    m > 0 /\ 
+    if interp2 t >. 0. then _B(-m) <. interp2 t
+               else interp2 t <. -. _B(-m) }
+=
+  let ghost x = interp2 t in
+  if x >. 0. then 
+    exists_m (interp2 t)
+  else
+    exists_m (-. (interp2 t))
+
 let rec compute2 (t: term2) (n: int) : int
   requires { wf_term2 t }
   requires { 0 <= n }
-  variant { t }
+  variant { (t (* , -n *) ) (* with lex *) }
   ensures { framing (interp2 t) result n }
 =
   match t with
@@ -814,7 +880,7 @@ with msd (t: term2) (n: int) (c: int) : (int, bool)
   requires { wf_term2 t }
   requires { interp2 t <> 0. }
   requires { framing (interp2 t) c n }
-  variant { (t, -n) }
+  variant { (t,  - n) }
   ensures { let m, sgn = result in
     0 <= m /\
     if sgn then  _B(-m) <. interp2 t else interp2 t <. -. _B(-m) }
@@ -825,7 +891,10 @@ with msd (t: term2) (n: int) (c: int) : (int, bool)
   end
   else begin
     if 1 < c then
-      let _ = assert { _B(-n) <. interp2 t } in
+      let _ = assert { _B(-n) <. interp2 t
+        by interp2 t
+          >. (from_int (c - 1)) *. _B(-n)
+          >=. _B(-n)  } in
       n, true
     else
       let ghost t0 = interp2 t in
