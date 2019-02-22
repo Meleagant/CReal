@@ -199,7 +199,23 @@ autogobble]{#1}%
 \maketitle
 
 \section*{Introduction}
-\TODO
+
+Le projet a été traité dans son intégralité à l'exception des questions 23
+(fonction \texttt{inv\_simple\_simple}) et 27 (terminaison de la fonction
+\texttt{compute}).
+J'ai utilisé deux solveurs : Alt-Ergo 2.2.0 et Z3 4.4.1. et dans la majorité des
+cas, les preuves se font en moins d'une minute.
+Afin de ménager mon ordinateur, j'ai préféré faire des tactiques \texttt{split}
+ainsi que de nombreux \texttt{assert}.
+De plus, après certains \texttt{why3 replay}, des buts n'étaient plus prouvés
+(les solveurs dépassaient le temps imparti).
+J'ai donc du rajouter des \texttt{assert} qui peuvent paraître redondants.
+Par exemple dans les cas où il fait \textit{déplacer} les \texttt{from\_int}.
+
+
+
+
+
 \tableofcontents
 \listoflistings
 
@@ -253,7 +269,7 @@ $2^\ell > 0$
 \end{listing}
 
 \textbf{II.2}
-Une fois donnée la définition de la fonction \texttt{power2}, la défnition de
+Une fois donnée la définition de la fonction \texttt{power2}, la définition de
 \texttt{shift\_left} est immédiate.
 
 \begin{listing}[H]
@@ -300,7 +316,7 @@ let ediv_mod (x:int) (y:int) : (int, int)
 
 \textbf{II.4}
 De même que pour la question I.2, la fonction \texttt{shift\_right} est définie
-sans problèmes en utilisant la divsion euclidienne de la fonction
+sans problèmes en utilisant la division euclidienne de la fonction
 précédente.
 
 \begin{listing}
@@ -357,7 +373,7 @@ montrer que $\sqrt{\B(2n)} = \B(n)$.
 
 \textbf{III.13}
 
-Dans \TODO il y a deux deux définitions equvalentes de \texttt{framing} :
+Dans \TODO il y a deux deux définitions équivalentes de \texttt{framing} :
 \begin{align}
 \forall x \in \R, p, n \in \Z,\  \nonumber
 	& \texttt{framing}\ x\ p\ n \\
@@ -499,7 +515,7 @@ résultat
 
 Bien que n'étant pas une question à proprement parler, la preuve de la fonction
 \texttt{compute\_cst} a nécessité des \texttt{asserts} pour guider les solveurs
-dans le cas \texttt{n < 0}. Les uatres cas (\texttt{n = 0} et \texttt{n > 0})
+dans le cas \texttt{n < 0}. Les autres cas (\texttt{n = 0} et \texttt{n > 0})
 ont été prouvés sans problèmes par les solveurs.
 Encore une fois, la preuve s'est faite en prouvant séparément les inégalités.
 
@@ -878,7 +894,7 @@ Maman, j'y arrive pas !
 
 \section*{Conclusion}
 
-Le projet est clairement cool ! 
+
 
 %\newpage
 %\tableofcontents
